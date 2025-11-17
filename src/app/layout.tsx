@@ -9,28 +9,28 @@ export const metadata: Metadata = {
   title: 'Free PDF to Word Converter Online | Fast & Accurate | PDF2Word',
   description:
     'Convert PDF to Word (DOCX) online for free. Fast, accurate, and secure PDF to Word converter. No sign-up required.',
-  keywords: 'pdf to word, convert pdf to docx, free pdf converter, word to pdf, pdf tools',
+  keywords: 'pdf to word, convert pdf to docx, free pdf converter, word to pdf, pdf tools, pdf to word converter no sign up, best pdf to word tool, convert scanned pdf, ocr pdf to word, convert large pdf to word, fast pdf converter, pdf editor, edit pdf in word',
   robots: 'index, follow',
   openGraph: {
-    title: 'Free PDF to Word Converter Online | Fast & Accurate | PDF2Word',
-    description:
-      'Convert PDF to Word (DOCX) online for free. Fast, accurate, and secure PDF to Word converter. No sign-up required.',
+    title: 'Free PDF to Word Converter Online | Fast & Accurate',
+    description: 'Convert PDF to Word (DOCX) online for free. Fast, accurate and secure PDF to Word converter. No signup.',
+    url: 'https://pdf2word.all2ools.com/',
+    type: 'website',
     images: [
       {
-        url: 'https://pdf2word.all2ools.com/images/pdf-converter-preview.png',
+        url: 'https://pdf2word.all2ools.com/og-image.png',
         width: 1200,
         height: 630,
         alt: 'PDF2Word & Word2PDF Converter',
       },
     ],
-    url: 'https://pdf2word.all2ools.com/',
     siteName: 'PDF2Word',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free PDF to Word Converter Online | Fast & Accurate | PDF2Word',
-    description: 'Convert PDF to Word or Word to PDF instantly — free, no login, and secure.',
-    images: ['https://pdf2word.all2ools.com/images/pdf-converter-preview.png'],
+    title: 'Free PDF to Word Converter Online',
+    description: 'Fast, secure and free PDF to Word converter.',
+    images: ['https://pdf2word.all2ools.com/og-image.png'],
   },
   metadataBase: new URL('https://pdf2word.all2ools.com'),
   alternates: {
@@ -64,11 +64,6 @@ export default function RootLayout({
                   "@type": "Offer",
                   "price": "0",
                   "priceCurrency": "USD"
-                },
-                "aggregateRating": {
-                  "@type": "AggregateRating",
-                  "ratingValue": "4.9",
-                  "ratingCount": "1250"
                 },
                 "featureList": [
                   "Convert PDF to Word",
