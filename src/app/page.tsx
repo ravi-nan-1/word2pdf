@@ -15,6 +15,7 @@ export default function Home() {
         <p className="text-lg text-muted-foreground text-center max-w-3xl mb-8">
           A PDF to Word converter is an online tool that transforms a PDF file into an editable Microsoft Word document (in .docx format). While PDFs are perfect for sharing and printing, they are difficult to edit. That’s why converting a PDF to Word is essential when you want to update information, fix formatting, or reuse content. Our free PDF to Word converter unlocks your PDF, allowing you to make changes instantly in Word, Google Docs, or any text editor.
         </p>
+        <h2 className="text-3xl font-bold text-center mb-6">Convert PDF to Word Online (Fast & Free)</h2>
         <FileConverter />
         <TrustAndSecurity />
         <SeoContent />
