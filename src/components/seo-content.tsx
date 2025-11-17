@@ -6,50 +6,58 @@ export function SeoContent() {
     <div className="w-full max-w-4xl mx-auto px-4 py-12 space-y-12 text-lg leading-relaxed">
       
       <section>
-        <h2 className="text-3xl font-bold mb-4">What is a PDF to Word Converter?</h2>
-        <p>A PDF to Word converter is a tool that transforms a Portable Document Format (PDF) file into an editable Microsoft Word document (typically in .docx format). PDFs are excellent for sharing and printing files while preserving layout and formatting, but they are notoriously difficult to edit. When you need to make changes to a PDF—whether it's correcting a typo, updating information, or repurposing content—a converter becomes essential. It unlocks the static content within the PDF, making it fully editable in a familiar word processing environment like Microsoft Word.</p>
+        <h2 className="text-3xl font-bold mb-4">What Is a PDF to Word Converter?</h2>
+        <p>A PDF to Word converter is a tool that transforms any PDF file into an editable Microsoft Word document (usually in DOCX format). PDFs are perfect for sharing, printing, and preserving layout — but they are difficult to edit.</p>
+        <p className="mt-4">When you need to update a resume, modify a report, fix a proposal, extract text, or repurpose content, converting a PDF to Word becomes essential. Our free PDF to Word converter unlocks your PDF content and makes it fully editable in Microsoft Word or Google Docs.</p>
       </section>
 
       <section>
         <h2 className="text-3xl font-bold mb-4">How Does PDF to Word Conversion Work?</h2>
-        <p className="mb-4">Our converter employs sophisticated algorithms to analyze the structure of your PDF file. Here’s a simplified breakdown of the process:</p>
+        <p className="mb-4">Our converter uses advanced document-processing algorithms and OCR technology to ensure an accurate conversion. Here's how it works:</p>
         <ol className="list-decimal list-inside space-y-2">
-            <li><strong>Structural Analysis:</strong> The tool first identifies all the elements within the PDF, such as text blocks, images, tables, headers, and footers.</li>
-            <li><strong>Content Extraction:</strong> It then extracts this content layer by layer. For text, it recognizes characters and their formatting (font, size, color, bold, italics). For images, it preserves the original picture data.</li>
-            <li><strong>Optical Character Recognition (OCR):</strong> If the PDF is a scanned document (an image of text), our advanced OCR engine kicks in. It 'reads' the text from the image and converts it into editable characters.</li>
-            <li><strong>Reconstruction:</strong> Finally, the tool meticulously reconstructs all these elements into a .docx file, attempting to match the original layout as closely as possible. This ensures that paragraphs, columns, lists, and tables appear in Word just as they did in the PDF.</li>
+            <li><strong>Structural Analysis</strong>: The system identifies headings, text blocks, paragraphs, lists, columns, tables, fonts, and spacing.</li>
+            <li><strong>Content Extraction</strong>: Text is extracted with formatting, fonts & font sizes preserved, images and illustrations retained, and tables reconstructed.</li>
+            <li><strong>OCR for Scanned PDFs</strong>: If your PDF is scanned (image-based), our OCR engine reads the text from the images and converts it into editable characters. This is perfect for printed books, documents captured with a phone, and old scan files.</li>
+            <li><strong>Reconstruction</strong>: Everything is reassembled into a clean, editable .docx file, keeping the original formatting as closely as possible.</li>
         </ol>
       </section>
 
       <section>
         <h2 className="text-3xl font-bold mb-4">Features & Benefits</h2>
         <ul className="list-disc list-inside space-y-3">
-            <li><strong>High Accuracy:</strong> Preserves original layout, text, images, and formatting with precision.</li>
-            <li><strong>OCR for Scanned PDFs:</strong> Turns non-editable scanned documents into fully workable Word files.</li>
-            <li><strong>No Registration Required:</strong> Convert files instantly without the need for an account or email signup.</li>
-            <li><strong>Completely Free:</strong> Enjoy unlimited conversions without any cost or hidden fees.</li>
-            <li><strong>Secure & Private:</strong> We use SSL encryption and automatically delete your files after one hour. Your data is never stored or shared.</li>
-            <li><strong>Cross-Platform Compatibility:</strong> Works on any operating system (Windows, Mac, Linux) and any device with a modern web browser.</li>
+            <li><strong>High-Accuracy Conversion</strong>: Your Word document will retain paragraph structure, images & graphics, lists and bullet points, headings & subheadings, and tables.</li>
+            <li><strong>OCR for Scanned PDFs</strong>: Convert scanned PDFs into real, editable text — not just images.</li>
+            <li><strong>No Registration Required</strong>: Use the tool instantly. No email, no sign-up, no account.</li>
+            <li><strong>Completely Free</strong>: Unlimited conversions. No pro plan. No hidden fees.</li>
+            <li><strong>Secure & Private</strong>: SSL encryption and auto-delete files after 1 hour. We do NOT store or share your documents.</li>
+            <li><strong>Works Everywhere</strong>: Compatible with Windows, Mac, Linux, Android, and iOS.</li>
         </ul>
       </section>
 
       <section>
-        <h2 className="text-3xl font-bold mb-4">Supported Formats and Use-Cases</h2>
-        <p className="mb-4">Our tool is designed for flexibility, catering to a wide range of users:</p>
+        <h2 className="text-3xl font-bold mb-4">Supported Formats</h2>
+        <p><strong>Input:</strong> PDF (all types — text-based, scanned, multi-page, exported PDFs)<br />
+        <strong>Output:</strong> DOCX (Microsoft Word)</p>
+      </section>
+
+      <section>
+        <h2 className="text-3xl font-bold mb-4">Who Is This Tool For?</h2>
         <ul className="list-disc list-inside space-y-3">
-            <li><strong>For Students:</strong> Quickly convert lecture notes, research papers, and textbook chapters into editable formats for easier studying and note-taking.</li>
-            <li><strong>For Offices:</strong> Edit reports, invoices, contracts, and manuals without having to recreate them from scratch. Streamline your workflow and save valuable time.</li>
-            <li><strong>For Freelancers:</strong> Adapt client briefs, edit portfolios, or extract text from a client’s PDF to use in your work.</li>
+            <li><strong>Students:</strong> Convert lecture notes, textbooks, research PDFs, and study materials.</li>
+            <li><strong>Professionals:</strong> Edit contracts, client proposals, invoices, reports, or manuals instantly.</li>
+            <li><strong>Teachers:</strong> Convert educational PDFs into editable Word files for classroom use.</li>
+            <li><strong>Freelancers:</strong> Work with client PDFs easily and extract content for editing.</li>
         </ul>
       </section>
 
       <section>
-        <h2 className="text-3xl font-bold mb-4">Step-by-Step Tutorial</h2>
+        <h2 className="text-3xl font-bold mb-4">How to Convert PDF to Word (Step-by-Step Guide)</h2>
         <ol className="list-decimal list-inside space-y-2">
-          <li><strong>Upload Your File:</strong> Click the 'Upload' button or drag and drop your PDF file into the designated area.</li>
-          <li><strong>Convert:</strong> The conversion process starts automatically. Our tool will analyze and transform your file in seconds.</li>
-          <li><strong>Download:</strong> Once finished, click the 'Download' button to save your newly created, editable Word document.</li>
+          <li>Click the <strong>Upload</strong> button or drag your PDF into the upload area.</li>
+          <li>Conversion begins automatically — no extra steps.</li>
+          <li>Download the final DOCX file in one click.</li>
         </ol>
+        <p className="mt-2 font-semibold">Fast. Simple. Free.</p>
       </section>
       
       <section>
@@ -72,29 +80,34 @@ const ComparisonTable = () => (
                 <TableRow>
                     <TableHead>Feature</TableHead>
                     <TableHead>PDF2Word</TableHead>
-                    <TableHead>Other Online Tools</TableHead>
+                    <TableHead>Other Tools</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 <TableRow>
                     <TableCell>Cost</TableCell>
-                    <TableCell className="text-green-600 font-semibold">Completely Free</TableCell>
-                    <TableCell>Often have limits or paid tiers</TableCell>
+                    <TableCell className="text-green-600 font-semibold">Free Forever</TableCell>
+                    <TableCell>Limited or Paid</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell>Registration</TableCell>
-                    <TableCell className="text-green-600 font-semibold">Not Required</TableCell>
-                    <TableCell>Usually requires email sign-up</TableCell>
+                    <TableCell className="text-green-600 font-semibold">No Signup Needed</TableCell>
+                    <TableCell>Requires Email/Login</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell>File Security</TableCell>
                     <TableCell className="text-green-600 font-semibold">Auto-delete after 1 hour</TableCell>
-                    <TableCell>Varies, some may store data</TableCell>
+                    <TableCell>Many store files</TableCell>
                 </TableRow>
                  <TableRow>
                     <TableCell>Conversion Limits</TableCell>
-                    <TableCell className="text-green-600 font-semibold">Unlimited</TableCell>
-                    <TableCell>Typically 1-2 per day on free plans</TableCell>
+                    <TableCell className="text-green-600 font-semibold">Unlimited Conversions</TableCell>
+                    <TableCell>1–2 free conversions/day</TableCell>
+                </TableRow>
+                 <TableRow>
+                    <TableCell>OCR Support</TableCell>
+                    <TableCell className="text-green-600 font-semibold">Yes, Free</TableCell>
+                    <TableCell>Often Paid</TableCell>
                 </TableRow>
             </TableBody>
         </Table>
