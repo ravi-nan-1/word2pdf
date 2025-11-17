@@ -7,7 +7,7 @@ export function Header() {
         <div className="bg-primary p-2 rounded-md">
            <Shuffle className="h-6 w-6 text-primary-foreground" />
         </div>
-        <h1 className="text-xl font-bold font-headline tracking-tight">FileFlipper</h1>
+        <h1 className="text-xl font-bold font-headline tracking-tight">PDF2Word</h1>
       </div>
     </header>
   );

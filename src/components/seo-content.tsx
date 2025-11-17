@@ -71,7 +71,7 @@ const ComparisonTable = () => (
             <TableHeader>
                 <TableRow>
                     <TableHead>Feature</TableHead>
-                    <TableHead>FileFlipper</TableHead>
+                    <TableHead>PDF2Word</TableHead>
                     <TableHead>Other Online Tools</TableHead>
                 </TableRow>
             </TableHeader>

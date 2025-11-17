@@ -18,7 +18,7 @@ export default function Home() {
         <RelatedTools />
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground bg-slate-50 dark:bg-slate-900 border-t">
-        © {new Date().getFullYear()} FileFlipper. All Rights Reserved.
+        © {new Date().getFullYear()} PDF2Word. All Rights Reserved.
       </footer>
     </div>
   );

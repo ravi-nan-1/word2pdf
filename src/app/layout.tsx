@@ -20,11 +20,11 @@ export const metadata: Metadata = {
         url: 'https://yourwebsite.com/images/pdf-converter-preview.png',
         width: 1200,
         height: 630,
-        alt: 'FileFlipper PDF and Word Converter',
+        alt: 'PDF2Word & Word2PDF Converter',
       },
     ],
     url: 'https://yourwebsite.com/',
-    siteName: 'FileFlipper',
+    siteName: 'PDF2Word',
   },
   twitter: {
     card: 'summary_large_image',
@@ -57,7 +57,7 @@ export default function RootLayout({
               "url": "https://yourwebsite.com/",
               "mainEntity": {
                 "@type": "SoftwareApplication",
-                "name": "FileFlipper PDF Converter",
+                "name": "PDF2Word Converter",
                 "operatingSystem": "Any (Web-based)",
                 "applicationCategory": "ProductivityApplication",
                 "offers": {
