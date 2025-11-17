@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://pdf2word.all2ools.com/og-image.png',
+        url: 'https://picsum.photos/seed/pdf2word/1200/630',
         width: 1200,
         height: 630,
         alt: 'PDF2Word Converter',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Free PDF to Word Converter Online',
     description: 'Fast, secure and accurate PDF to Word converter.',
-    images: ['https://pdf2word.all2ools.com/og-image.png'],
+    images: ['https://picsum.photos/seed/pdf2word/1200/630'],
   },
   metadataBase: new URL('https://pdf2word.all2ools.com'),
   alternates: {
