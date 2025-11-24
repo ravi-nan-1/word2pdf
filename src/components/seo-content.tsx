@@ -48,21 +48,21 @@ export function SeoContent() {
               <span>PDF → PowerPoint</span>
               <span>PPT → PDF</span>
               <span>HTML → PDF</span>
-              <span>Compress PDF</span>
+              <span>Compress PDF (High / Regular / Extreme)</span>
               <span>Merge PDF</span>
-              <span>Split PDF</span>
+              <span>Split PDF (by range, by pages)</span>
               <span>Extract pages</span>
               <span>Delete pages</span>
-              <span>Reorder pages</span>
+              <span>Reorder pages (drag-and-drop)</span>
               <span>Rotate pages</span>
-              <span>Add Watermark</span>
-              <span>Add Page Numbers</span>
-              <span>Protect PDF</span>
-              <span>Unlock PDF</span>
+              <span>Add Watermark (text & image)</span>
+              <span>Add Page Numbers (position, format)</span>
+              <span>Protect PDF (password)</span>
+              <span>Unlock PDF (password removal)</span>
               <span>Repair PDF</span>
               <span>Convert to PDF/A</span>
-              <span>OCR PDF → Word</span>
-              <span>Edit PDF</span>
+              <span>OCR PDF → Word (scanned PDF)</span>
+              <span>Edit PDF (text, images, shapes)</span>
             </div>
           </div>
           
@@ -70,22 +70,22 @@ export function SeoContent() {
             <h3 className="text-2xl font-semibold mb-4 flex items-center"><Zap className="h-6 w-6 text-blue-500 mr-2" /> Advanced Features</h3>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2">
               <span>Batch processing</span>
-              <span>Chained workflows</span>
-              <span>Cloud uploads</span>
-              <span>File viewer</span>
+              <span>Chained workflows (convert → compress → download)</span>
+              <span>Cloud uploads: Google Drive, Dropbox</span>
+              <span>File viewer + page thumbnail preview</span>
               <span>Dark mode UI</span>
-              <span>Offline Desktop app</span>
-              <span>API Endpoints</span>
-              <span>Mobile responsive</span>
-              <span>Secure file deletion</span>
+              <span>Offline-capable Desktop app (Electron)</span>
+              <span>API endpoint for each tool</span>
+              <span>Mobile responsive design</span>
+              <span>File deletion after X minutes (configurable)</span>
             </div>
           </div>
 
           <div>
             <h3 className="text-2xl font-semibold mb-4 flex items-center"><Gem className="h-6 w-6 text-purple-500 mr-2" /> Premium Features (Optional)</h3>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2">
-              <span>eSignatures</span>
-              <span>Team Workspace</span>
+              <span>eSignatures (draw, upload, type)</span>
+              <span>Team Workspace (users, roles, analytics)</span>
               <span>Unlimited file size</span>
               <span>Unlimited batch tools</span>
               <span>Ad-free mode</span>
