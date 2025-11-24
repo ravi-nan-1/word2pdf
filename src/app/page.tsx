@@ -1,3 +1,6 @@
+
+"use client";
+
 import { FileConverter } from "@/components/file-converter";
 import { Header } from "@/components/header";
 import { TrustAndSecurity } from "@/components/trust-and-security";
@@ -5,8 +8,13 @@ import { SeoContent } from "@/components/seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import Link from "next/link";
 import { FeatureGrid } from "@/components/feature-grid";
+import { useState } from "react";
+import type { ConversionType } from "@/components/file-converter";
+
 
 export default function Home() {
+  const [conversionType, setConversionType] = useState<ConversionType>("pdf-to-word");
+
   return (
     <div className="flex flex-col min-h-screen bg-background dark:bg-black">
       <Header />
@@ -18,8 +26,8 @@ export default function Home() {
           A PDF to Word converter is an online tool that transforms a PDF file into an editable Microsoft Word document (in .docx format). While PDFs are perfect for sharing and printing, they are difficult to edit. That’s why converting a PDF to Word is essential when you want to update information, fix formatting, or reuse content. Our free PDF to Word converter unlocks your PDF, allowing you to make changes instantly in Word, Google Docs, or any text editor.
         </p>
         <h2 className="text-3xl font-bold text-center mb-6">Convert PDF to Word Online (Fast & Free)</h2>
-        <FileConverter />
-        <FeatureGrid />
+        <FileConverter conversionType={conversionType} setConversionType={setConversionType} />
+        <FeatureGrid setConversionType={setConversionType} />
         <TrustAndSecurity />
         <SeoContent />
         <RelatedTools />

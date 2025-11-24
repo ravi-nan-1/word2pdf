@@ -1,4 +1,5 @@
 
+
 import {
   ArrowRightLeft,
   FileImage,
@@ -34,34 +35,34 @@ import {
   Gem
 } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from 'next/link';
+import type { ConversionType } from "./file-converter";
 
 
-const coreTools = [
-  { name: "PDF to Word", icon: <ArrowRightLeft /> },
-  { name: "Word to PDF", icon: <ArrowRightLeft /> },
-  { name: "PDF to JPG", icon: <FileImage /> },
-  { name: "JPG to PDF", icon: <FileImage /> },
-  { name: "PDF to Excel", icon: <FileSpreadsheet /> },
-  { name: "Excel to PDF", icon: <FileSpreadsheet /> },
-  { name: "PDF to PowerPoint", icon: <Presentation /> },
-  { name: "PPT to PDF", icon: <Presentation /> },
-  { name: "HTML to PDF", icon: <FileCode /> },
-  { name: "Compress PDF", icon: <Shrink /> },
-  { name: "Merge PDF", icon: <Combine /> },
-  { name: "Split PDF", icon: <Split /> },
-  { name: "Extract pages", icon: <BookCopy /> },
-  { name: "Delete pages", icon: <Grab /> },
-  { name: "Reorder pages", icon: <Layers /> },
-  { name: "Rotate pages", icon: <RotateCcw /> },
-  { name: "Add Watermark", icon: <PenSquare /> },
-  { name: "Add Page Numbers", icon: <BookCopy /> },
-  { name: "Protect PDF", icon: <Shield /> },
-  { name: "Unlock PDF", icon: <Unlock /> },
-  { name: "Repair PDF", icon: <Wrench /> },
-  { name: "Convert to PDF/A", icon: <FileCheck /> },
-  { name: "OCR PDF to Word", icon: <ScanText /> },
-  { name: "Edit PDF", icon: <PenSquare /> },
+const coreTools: { name: string; icon: React.ReactNode; conversion: ConversionType | null }[] = [
+  { name: "PDF to Word", icon: <ArrowRightLeft />, conversion: "pdf-to-word" },
+  { name: "Word to PDF", icon: <ArrowRightLeft />, conversion: "word-to-pdf" },
+  { name: "PDF to JPG", icon: <FileImage />, conversion: "pdf-to-jpg" },
+  { name: "JPG to PDF", icon: <FileImage />, conversion: null },
+  { name: "PDF to Excel", icon: <FileSpreadsheet />, conversion: null },
+  { name: "Excel to PDF", icon: <FileSpreadsheet />, conversion: null },
+  { name: "PDF to PowerPoint", icon: <Presentation />, conversion: null },
+  { name: "PPT to PDF", icon: <Presentation />, conversion: null },
+  { name: "HTML to PDF", icon: <FileCode />, conversion: null },
+  { name: "Compress PDF", icon: <Shrink />, conversion: null },
+  { name: "Merge PDF", icon: <Combine />, conversion: null },
+  { name: "Split PDF", icon: <Split />, conversion: null },
+  { name: "Extract pages", icon: <BookCopy />, conversion: null },
+  { name: "Delete pages", icon: <Grab />, conversion: null },
+  { name: "Reorder pages", icon: <Layers />, conversion: null },
+  { name: "Rotate pages", icon: <RotateCcw />, conversion: null },
+  { name: "Add Watermark", icon: <PenSquare />, conversion: null },
+  { name: "Add Page Numbers", icon: <BookCopy />, conversion: null },
+  { name: "Protect PDF", icon: <Shield />, conversion: null },
+  { name: "Unlock PDF", icon: <Unlock />, conversion: null },
+  { name: "Repair PDF", icon: <Wrench />, conversion: null },
+  { name: "Convert to PDF/A", icon: <FileCheck />, conversion: null },
+  { name: "OCR PDF to Word", icon: <ScanText />, conversion: null },
+  { name: "Edit PDF", icon: <PenSquare />, conversion: null },
 ];
 
 const advancedFeatures = [
@@ -84,10 +85,13 @@ const premiumFeatures = [
   { name: "Ad-free mode", icon: <BadgeX /> },
 ];
 
-const FeatureCard = ({ name, icon }: { name: string, icon: React.ReactNode }) => (
-  <Card className="hover:shadow-lg hover:border-primary transition-all cursor-pointer">
+const FeatureCard = ({ name, icon, onClick, disabled }: { name: string, icon: React.ReactNode, onClick: () => void, disabled: boolean }) => (
+  <Card 
+    onClick={disabled ? undefined : onClick}
+    className={`hover:shadow-lg transition-all ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:border-primary'}`}
+  >
     <CardHeader className="flex flex-row items-center gap-4">
-      <div className="text-primary">{icon}</div>
+      <div className={`${disabled ? 'text-muted-foreground' : 'text-primary'}`}>{icon}</div>
       <CardTitle className="text-base font-medium">{name}</CardTitle>
     </CardHeader>
   </Card>
@@ -105,22 +109,35 @@ const Section = ({ title, children, icon }: { title: string, children: React.Rea
   </section>
 );
 
-export function FeatureGrid() {
+export function FeatureGrid({ setConversionType }: { setConversionType: (type: ConversionType) => void }) {
+  const handleFeatureClick = (conversion: ConversionType | null) => {
+    if (conversion) {
+      setConversionType(conversion);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="w-full mt-12">
       <Section title="Core PDF Tools" icon={<Wrench className="h-8 w-8 text-primary" />}>
         {coreTools.map((tool) => (
-          <FeatureCard key={tool.name} name={tool.name} icon={tool.icon} />
+          <FeatureCard 
+            key={tool.name} 
+            name={tool.name} 
+            icon={tool.icon}
+            onClick={() => handleFeatureClick(tool.conversion)}
+            disabled={!tool.conversion}
+          />
         ))}
       </Section>
       <Section title="Advanced Features" icon={<Zap className="h-8 w-8 text-primary" />}>
         {advancedFeatures.map((feature) => (
-          <FeatureCard key={feature.name} name={feature.name} icon={feature.icon} />
+          <FeatureCard key={feature.name} name={feature.name} icon={feature.icon} onClick={() => {}} disabled={true} />
         ))}
       </Section>
        <Section title="Premium Features" icon={<Gem className="h-8 w-8 text-primary" />}>
         {premiumFeatures.map((feature) => (
-          <FeatureCard key={feature.name} name={feature.name} icon={feature.icon} />
+          <FeatureCard key={feature.name} name={feature.name} icon={feature.icon} onClick={() => {}} disabled={true} />
         ))}
       </Section>
     </div>
