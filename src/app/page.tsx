@@ -37,6 +37,11 @@ export default function Home() {
           title: "Free JPG to PDF Converter – Simple & Secure",
           subtitle: "Convert JPG to PDF Online (Fast & Free)"
         };
+      case "pdf-to-excel":
+        return {
+          title: "Free PDF to Excel Converter – Accurate Data Extraction",
+          subtitle: "Convert PDF to Excel Online (Fast & Free)"
+        };
       default:
         return {
           title: "Free PDF to Word Converter – Fast, Accurate & No Signup",

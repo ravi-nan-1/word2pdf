@@ -43,7 +43,7 @@ const coreTools: { name: string; icon: React.ReactNode; conversion: ConversionTy
   { name: "Word to PDF", icon: <ArrowRightLeft />, conversion: "word-to-pdf" },
   { name: "PDF to JPG", icon: <FileImage />, conversion: "pdf-to-jpg" },
   { name: "JPG to PDF", icon: <FileImage />, conversion: "jpg-to-pdf" },
-  { name: "PDF to Excel", icon: <FileSpreadsheet />, conversion: null },
+  { name: "PDF to Excel", icon: <FileSpreadsheet />, conversion: "pdf-to-excel" },
   { name: "Excel to PDF", icon: <FileSpreadsheet />, conversion: null },
   { name: "PDF to PowerPoint", icon: <Presentation />, conversion: null },
   { name: "PPT to PDF", icon: <Presentation />, conversion: null },

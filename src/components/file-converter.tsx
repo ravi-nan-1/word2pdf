@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage } from "lucide-react";
+import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage, FileSpreadsheet } from "lucide-react";
 
-export type ConversionType = "pdf-to-word" | "word-to-pdf" | "pdf-to-jpg" | "jpg-to-pdf";
+export type ConversionType = "pdf-to-word" | "word-to-pdf" | "pdf-to-jpg" | "jpg-to-pdf" | "pdf-to-excel";
 type ConversionStatus = "idle" | "uploading" | "converting" | "done" | "error";
 
 interface FileConverterProps {
@@ -72,6 +72,15 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
           fromType: "JPG",
           toType: "PDF",
           accept: "image/jpeg",
+        };
+      case "pdf-to-excel":
+        return {
+            title: "PDF to Excel",
+            fromIcon: <FileText className="h-10 w-10 text-destructive" />,
+            toIcon: <FileSpreadsheet className="h-10 w-10 text-primary" />,
+            fromType: "PDF",
+            toType: "Excel",
+            accept: "application/pdf",
         };
       default:
         return {
@@ -162,6 +171,10 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
         case "jpg-to-pdf":
             newExtension = ".pdf";
             mimeType = "application/pdf";
+            break;
+        case "pdf-to-excel":
+            newExtension = ".xlsx";
+            mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
             break;
         default:
             newExtension = ".zip";
