@@ -105,5 +105,3 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500 });
   }
 }
-
-    
