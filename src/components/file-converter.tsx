@@ -79,15 +79,15 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
-      const allowedTypes = conversionInfo.accept.split(',');
+      const allowedTypes = conversionInfo.accept.split(',').map(t => t.trim());
 
       if (allowedTypes.includes(selectedFile.type)) {
         setFile(selectedFile);
         setStatus("uploading");
       } else {
         toast({
-          title: "Invalid file type",
-          description: `Please upload a file of type: ${conversionInfo.fromType}`,
+          title: "Unsupported File Format",
+          description: `We don't support this file format. Please upload a ${conversionInfo.fromType} file.`,
           variant: "destructive",
         });
         e.target.value = '';
