@@ -4,12 +4,13 @@ import { TrustAndSecurity } from "@/components/trust-and-security";
 import { SeoContent } from "@/components/seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import Link from "next/link";
+import { FeatureGrid } from "@/components/feature-grid";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background dark:bg-black">
       <Header />
-      <main className="flex-1 flex flex-col items-center justify-center p-4">
+      <main className="flex-1 flex flex-col items-center p-4">
         <h1 className="text-4xl md:text-5xl font-bold font-headline text-center my-8">
           Free PDF to Word Converter – Fast, Accurate & No Signup
         </h1>
@@ -18,6 +19,7 @@ export default function Home() {
         </p>
         <h2 className="text-3xl font-bold text-center mb-6">Convert PDF to Word Online (Fast & Free)</h2>
         <FileConverter />
+        <FeatureGrid />
         <TrustAndSecurity />
         <SeoContent />
         <RelatedTools />

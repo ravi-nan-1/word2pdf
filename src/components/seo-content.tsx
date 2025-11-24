@@ -32,69 +32,6 @@ export function SeoContent() {
       </section>
 
       <section>
-        <h2 className="text-3xl font-bold mb-4">Full Suite of PDF Tools</h2>
-        <p className="mb-6">Beyond PDF to Word, our platform offers a complete set of tools to handle any document task.</p>
-
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-2xl font-semibold mb-4 flex items-center"><Star className="h-6 w-6 text-yellow-500 mr-2" /> Core PDF Tools</h3>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2">
-              <span>PDF → Word (DOCX)</span>
-              <span>Word → PDF</span>
-              <span>PDF → JPG</span>
-              <span>JPG → PDF</span>
-              <span>PDF → Excel</span>
-              <span>Excel → PDF</span>
-              <span>PDF → PowerPoint</span>
-              <span>PPT → PDF</span>
-              <span>HTML → PDF</span>
-              <span>Compress PDF (High / Regular / Extreme)</span>
-              <span>Merge PDF</span>
-              <span>Split PDF (by range, by pages)</span>
-              <span>Extract pages</span>
-              <span>Delete pages</span>
-              <span>Reorder pages (drag-and-drop)</span>
-              <span>Rotate pages</span>
-              <span>Add Watermark (text & image)</span>
-              <span>Add Page Numbers (position, format)</span>
-              <span>Protect PDF (password)</span>
-              <span>Unlock PDF (password removal)</span>
-              <span>Repair PDF</span>
-              <span>Convert to PDF/A</span>
-              <span>OCR PDF → Word (scanned PDF)</span>
-              <span>Edit PDF (text, images, shapes)</span>
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="text-2xl font-semibold mb-4 flex items-center"><Zap className="h-6 w-6 text-blue-500 mr-2" /> Advanced Features</h3>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2">
-              <span>Batch processing</span>
-              <span>Chained workflows (convert → compress → download)</span>
-              <span>Cloud uploads: Google Drive, Dropbox</span>
-              <span>File viewer + page thumbnail preview</span>
-              <span>Dark mode UI</span>
-              <span>Offline-capable Desktop app (Electron)</span>
-              <span>API endpoint for each tool</span>
-              <span>Mobile responsive design</span>
-              <span>File deletion after X minutes (configurable)</span>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-semibold mb-4 flex items-center"><Gem className="h-6 w-6 text-purple-500 mr-2" /> Premium Features (Optional)</h3>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2">
-              <span>eSignatures (draw, upload, type)</span>
-              <span>Team Workspace (users, roles, analytics)</span>
-              <span>Unlimited file size</span>
-              <span>Unlimited batch tools</span>
-              <span>Ad-free mode</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section>
         <h2 className="text-3xl font-bold mb-4">Supported Formats & Use Cases</h2>
         <p>Our tool supports various file types and user needs:</p>
         <div className="grid md:grid-cols-3 gap-6 mt-4">
