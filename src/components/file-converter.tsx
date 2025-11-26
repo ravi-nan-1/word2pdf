@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage, FileSpreadsheet, Presentation } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 export type ConversionType = 
   | "pdf-to-word" | "word-to-pdf" 
@@ -36,7 +37,7 @@ const getConversionInfo = (conversionType: ConversionType) => {
     const baseInfo = {
         accept: 'application/pdf',
         multiple: false,
-        params: [] as { id: string; label: string; type: string }[],
+        params: [] as ({ id: string; label: string; type: string; options?: string[] } | { id: string; label: string; type: 'select'; options: string[] })[],
     };
     switch (conversionType) {
         case "pdf-to-word": return { ...baseInfo, title: "PDF to Word", actionText: "Convert to Word", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileSignature className="h-10 w-10 text-primary" />, fromType: "PDF", toType: "Word", accept: "application/pdf" };
@@ -55,7 +56,7 @@ const getConversionInfo = (conversionType: ConversionType) => {
         case "reorder-pages": return { ...baseInfo, title: "Reorder Pages", actionText: "Reorder Pages", fromType: "PDF", toType: "PDF", params: [{ id: 'new_order', label: 'New page order (e.g., 3,1,2,4)', type: 'text' }] };
         case "rotate-pages": return { ...baseInfo, title: "Rotate Pages", actionText: "Rotate Pages", fromType: "PDF", toType: "PDF", params: [{ id: 'rotation_angle', label: 'Rotation Angle (90, 180, 270)', type: 'number' }, { id: 'pages', label: 'Pages to rotate (e.g., 1, 3, all)', type: 'text' }] };
         case "watermark-text": return { ...baseInfo, title: "Add Text Watermark", actionText: "Add Watermark", fromType: "PDF", toType: "PDF", params: [{ id: 'text', label: 'Watermark Text', type: 'text' }] };
-        case "add-page-numbers": return { ...baseInfo, title: "Add Page Numbers", actionText: "Add Numbers", fromType: "PDF", toType: "PDF" };
+        case "add-page-numbers": return { ...baseInfo, title: "Add Page Numbers", actionText: "Add Numbers", fromType: "PDF", toType: "PDF", params: [{ id: 'position', label: 'Position', type: 'select', options: ['bottom-center', 'bottom-left', 'bottom-right', 'top-center', 'top-left', 'top-right'] }, {id: 'margin', label: 'Margin', type: 'number'}, { id: 'pages', label: 'Pages to number (e.g., 1-5, all)', type: 'text' }] };
         case "protect-pdf": return { ...baseInfo, title: "Protect PDF", actionText: "Protect PDF", fromType: "PDF", toType: "PDF", params: [{ id: 'password', label: 'Password', type: 'password' }] };
         case "unlock-pdf": return { ...baseInfo, title: "Unlock PDF", actionText: "Unlock PDF", fromType: "PDF", toType: "PDF", params: [{ id: 'password', label: 'Password', type: 'password' }] };
         case "repair-pdf": return { ...baseInfo, title: "Repair PDF", actionText: "Repair PDF", fromType: "PDF", toType: "PDF" };
@@ -65,6 +66,148 @@ const getConversionInfo = (conversionType: ConversionType) => {
         default: return { ...baseInfo, title: "PDF to Word", actionText: "Convert to Word", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileSignature className="h-10 w-10 text-primary" />, fromType: "PDF", toType: "Word" };
     }
 };
+
+function FileDropZone({
+  conversionInfo,
+  status,
+  files,
+  additionalParams,
+  progress,
+  convertedFile,
+  handleFileChange,
+  handleParamChange,
+  handleConvert,
+  handleDownload,
+  resetState,
+  setFiles,
+}: {
+  conversionInfo: ReturnType<typeof getConversionInfo>;
+  status: ConversionStatus;
+  files: File[];
+  additionalParams: Record<string, string>;
+  progress: number;
+  convertedFile: { blob: Blob; name: string } | null;
+  handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleParamChange: (id: string, value: string) => void;
+  handleConvert: () => void;
+  handleDownload: () => void;
+  resetState: () => void;
+  setFiles: (files: File[]) => void;
+}) {
+  const { fromIcon, toIcon, fromType, actionText, accept, multiple, params } = conversionInfo;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-center items-center gap-6">
+        {fromIcon}
+        <ArrowRight className="h-8 w-8 text-muted-foreground" />
+        {toIcon}
+      </div>
+
+      {status === "idle" || status === "file-selected" ? (
+        <div className="relative border-2 border-dashed border-border rounded-lg p-10 text-center hover:border-primary transition-colors group">
+          <div className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-10 transition-opacity rounded-lg" />
+          <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
+          <p className="mt-4 font-semibold text-foreground">
+            Drop your {fromType} file{multiple ? 's' : ''} here
+          </p>
+          <p className="text-sm text-muted-foreground">or click to browse</p>
+          <Input
+            id="file-upload"
+            type="file"
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            onChange={handleFileChange}
+            accept={accept}
+            multiple={multiple}
+            aria-label={`Upload ${fromType} file`}
+          />
+        </div>
+      ) : null}
+
+      {files.length > 0 && (status === "file-selected" || status === "converting" || status === "done" || status === 'error') && (
+        <div className="border rounded-lg p-4 space-y-2 bg-secondary/50 relative">
+           {files.map((file, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center gap-3 overflow-hidden">
+                  {fromIcon}
+                  <span className="font-medium text-sm truncate">{file.name}</span>
+              </div>
+               {!multiple && (
+                 <Button variant="ghost" size="icon" onClick={() => setFiles(files.filter((_, i) => i !== index))} aria-label="Remove file">
+                  <X className="h-4 w-4" />
+                </Button>
+               )}
+            </div>
+          ))}
+           {files.length > 1 && (
+               <Button variant="ghost" size="sm" onClick={resetState} className="w-full">
+                  Remove All
+              </Button>
+          )}
+          {files.length === 1 && !multiple && (
+               <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={resetState} aria-label="Remove file">
+                <X className="h-4 w-4" />
+              </Button>
+          )}
+        </div>
+      )}
+
+      {status === "file-selected" && params && params.length > 0 && (
+          <div className="grid gap-4">
+              {params.map(param => (
+                  <div key={param.id} className="grid gap-2">
+                      <Label htmlFor={param.id}>{param.label}</Label>
+                      {param.type === 'select' ? (
+                        <Select onValueChange={(value) => handleParamChange(param.id, value)} defaultValue={additionalParams[param.id]}>
+                          <SelectTrigger id={param.id}>
+                            <SelectValue placeholder={param.label} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {param.options.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input 
+                          id={param.id} 
+                          type={param.type}
+                          placeholder={param.label}
+                          value={additionalParams[param.id] || ''}
+                          onChange={(e) => handleParamChange(param.id, e.target.value)}
+                        />
+                      )}
+                  </div>
+              ))}
+          </div>
+      )}
+
+      {status === 'converting' && (
+        <div className="space-y-2 text-center">
+          <Progress value={progress} className="w-full" />
+          <p className="text-sm text-muted-foreground animate-pulse">Converting... {progress}%</p>
+        </div>
+      )}
+      
+      {status === "file-selected" && files.length > 0 && (
+        <Button onClick={handleConvert} className="w-full" size="lg">
+          {actionText}
+        </Button>
+      )}
+
+      {status === "done" && (
+        <div className="grid gap-4 sm:grid-cols-2">
+           <Button onClick={handleDownload} className="w-full" size="lg">
+            <Download className="mr-2 h-4 w-4" />
+            Download File
+          </Button>
+          <Button onClick={resetState} className="w-full" size="lg" variant="outline">
+            Convert Another File
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export function FileConverter({ conversionType, setConversionType }: FileConverterProps) {
   const [files, setFiles] = useState<File[]>([]);
@@ -82,6 +225,13 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   
   useEffect(() => {
     resetState();
+    const newParams: Record<string, string> = {};
+    getConversionInfo(conversionType).params.forEach(param => {
+      if (param.id === 'position') newParams[param.id] = 'bottom-center';
+      if (param.id === 'margin') newParams[param.id] = '10';
+      if (param.id === 'pages') newParams[param.id] = 'all';
+    });
+    setAdditionalParams(newParams);
   }, [conversionType]);
 
   const resetState = () => {
@@ -281,131 +431,4 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   );
 }
 
-interface FileDropZoneProps {
-  conversionInfo: ReturnType<typeof getConversionInfo>;
-  status: ConversionStatus;
-  files: File[];
-  additionalParams: Record<string, string>;
-  progress: number;
-  convertedFile: { blob: Blob; name: string } | null;
-  handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleParamChange: (id: string, value: string) => void;
-  handleConvert: () => void;
-  handleDownload: () => void;
-  resetState: () => void;
-  setFiles: (files: File[]) => void;
-}
-
-function FileDropZone({
-  conversionInfo,
-  status,
-  files,
-  additionalParams,
-  progress,
-  handleFileChange,
-  handleParamChange,
-  handleConvert,
-  handleDownload,
-  resetState,
-  setFiles,
-}: FileDropZoneProps) {
-  const { fromIcon, toIcon, fromType, actionText, accept, multiple, params } = conversionInfo;
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-center items-center gap-6">
-        {fromIcon}
-        <ArrowRight className="h-8 w-8 text-muted-foreground" />
-        {toIcon}
-      </div>
-
-      {status === "idle" || status === "file-selected" ? (
-        <div className="relative border-2 border-dashed border-border rounded-lg p-10 text-center hover:border-primary transition-colors group">
-          <div className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-10 transition-opacity rounded-lg" />
-          <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-          <p className="mt-4 font-semibold text-foreground">
-            Drop your {fromType} file{multiple ? 's' : ''} here
-          </p>
-          <p className="text-sm text-muted-foreground">or click to browse</p>
-          <Input
-            id="file-upload"
-            type="file"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            onChange={handleFileChange}
-            accept={accept}
-            multiple={multiple}
-            aria-label={`Upload ${fromType} file`}
-          />
-        </div>
-      ) : null}
-
-      {files.length > 0 && (status === "file-selected" || status === "converting" || status === "done" || status === 'error') && (
-        <div className="border rounded-lg p-4 space-y-2 bg-secondary/50">
-           {files.map((file, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center gap-3 overflow-hidden">
-                  {fromIcon}
-                  <span className="font-medium text-sm truncate">{file.name}</span>
-              </div>
-               <Button variant="ghost" size="icon" onClick={() => setFiles(files.filter((_, i) => i !== index))} aria-label="Remove file">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-           {files.length > 1 && (
-               <Button variant="ghost" size="sm" onClick={resetState} className="w-full">
-                  Remove All
-              </Button>
-          )}
-          {files.length === 1 && !multiple && (
-               <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={resetState} aria-label="Remove file">
-                <X className="h-4 w-4" />
-              </Button>
-          )}
-        </div>
-      )}
-
-      {status === "file-selected" && params && params.length > 0 && (
-          <div className="grid gap-4">
-              {params.map(param => (
-                  <div key={param.id} className="grid gap-2">
-                      <Label htmlFor={param.id}>{param.label}</Label>
-                      <Input 
-                          id={param.id} 
-                          type={param.type}
-                          placeholder={param.label}
-                          value={additionalParams[param.id] || ''}
-                          onChange={(e) => handleParamChange(param.id, e.target.value)}
-                      />
-                  </div>
-              ))}
-          </div>
-      )}
-
-      {status === 'converting' && (
-        <div className="space-y-2 text-center">
-          <Progress value={progress} className="w-full" />
-          <p className="text-sm text-muted-foreground animate-pulse">Converting... {progress}%</p>
-        </div>
-      )}
-      
-      {status === "file-selected" && files.length > 0 && (
-        <Button onClick={handleConvert} className="w-full" size="lg">
-          {actionText}
-        </Button>
-      )}
-
-      {status === "done" && (
-        <div className="grid gap-4 sm:grid-cols-2">
-           <Button onClick={handleDownload} className="w-full" size="lg">
-            <Download className="mr-2 h-4 w-4" />
-            Download File
-          </Button>
-          <Button onClick={resetState} className="w-full" size="lg" variant="outline">
-            Convert Another File
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
+    
