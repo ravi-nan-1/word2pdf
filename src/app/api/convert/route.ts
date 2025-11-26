@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { ConversionType } from '@/components/file-converter';
@@ -28,7 +29,7 @@ const getApiEndpoint = (conversionType: ConversionType): string => {
         'repair-pdf': '/tools/repair',
         'pdf-to-pdfa': '/tools/pdfa',
         'ocr-pdf': '/tools/ocr',
-        'edit-pdf': '/tools/edit/add-text', // Or another appropriate edit endpoint
+        'edit-pdf': '/tools/edit/add-text',
     };
 
     if (!endpointMap[conversionType]) {
@@ -41,41 +42,68 @@ const getApiEndpoint = (conversionType: ConversionType): string => {
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File | null;
+    const files = formData.getAll('files') as File[];
     const conversionType = formData.get('conversionType') as ConversionType | null;
 
-    if (!file) {
-      return new NextResponse(JSON.stringify({ message: 'No file uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    if (!files || files.length === 0) {
+      return new NextResponse(JSON.stringify({ message: 'No files uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
     if (!conversionType) {
       return new NextResponse(JSON.stringify({ message: 'No conversion type specified' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     const apiEndpoint = getApiEndpoint(conversionType);
-    const apiUrl = `${API_BASE_URL}${apiEndpoint}`;
+    let apiUrl = `${API_BASE_URL}${apiEndpoint}`;
 
     const proxyFormData = new FormData();
-    proxyFormData.append('file', file);
+    files.forEach(file => {
+      proxyFormData.append('files', file);
+    });
+
+    // Handle additional parameters by forwarding them
+    const queryParams = new URLSearchParams();
+    formData.forEach((value, key) => {
+        if (key !== 'files' && key !== 'conversionType') {
+             if (typeof value === 'string') {
+                // For endpoints that expect query params, append them
+                if(['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf'].includes(conversionType)) {
+                    queryParams.set(key, value);
+                } else {
+                    // For endpoints expecting form data
+                    proxyFormData.append(key, value);
+                }
+            }
+        }
+    });
     
-    // For endpoints that require more than one file, like 'merge-pdf'
-    // The logic would need to be expanded to handle multiple files.
-    // For now, we assume single file uploads.
-    
+    const queryString = queryParams.toString();
+    if (queryString) {
+        apiUrl += `?${queryString}`;
+    }
+
     const fetchOptions: RequestInit = {
         method: 'POST',
         body: proxyFormData,
-        // It's important to not set the 'Content-Type' header manually when using FormData,
-        // as the browser or fetch API will set it with the correct boundary.
     };
     
+    // For endpoints that take query parameters, the body might not be FormData
+    if (['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf'].includes(conversionType)) {
+       // If only one file is expected, it should be named 'file', not 'files'
+       const singleFile = formData.get('files');
+       if (singleFile) {
+           const singleFileFormData = new FormData();
+           singleFileFormData.append('file', singleFile);
+           fetchOptions.body = singleFileFormData;
+       }
+    }
+
+
     const apiResponse = await fetch(apiUrl, fetchOptions);
 
     if (!apiResponse.ok) {
-        // Try to parse the error from the backend service
         const errorBody = await apiResponse.text();
         let errorMessage = `API request failed with status ${apiResponse.status}`;
 
-        // Check if the Render service is spinning up
         if (apiResponse.status === 502 && errorBody.includes('Web service is not available')) {
              errorMessage = 'The conversion service is starting up. Please try again in a few moments.';
         } else {
@@ -83,7 +111,6 @@ export async function POST(request: NextRequest) {
                 const errorJson = JSON.parse(errorBody);
                 errorMessage = errorJson.detail || errorMessage;
             } catch (e) {
-                // If the error is not JSON, use the raw text if it's not HTML
                 if (!errorBody.trim().startsWith('<')) {
                     errorMessage = errorBody;
                 }
@@ -93,7 +120,6 @@ export async function POST(request: NextRequest) {
         return new NextResponse(JSON.stringify({ message: errorMessage }), { status: apiResponse.status, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // Stream the response from the FastAPI backend to the client
     const headers = new Headers();
     headers.set('Content-Type', apiResponse.headers.get('Content-Type') || 'application/octet-stream');
     headers.set('Content-Disposition', apiResponse.headers.get('Content-Disposition') || `attachment; filename="converted-file"`);
@@ -113,3 +139,5 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
+
+    
