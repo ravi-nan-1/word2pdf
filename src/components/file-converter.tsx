@@ -64,7 +64,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     const baseInfo = {
         accept: 'application/pdf',
         multiple: false,
-        params: [],
+        params: [] as { id: string; label: string; type: string }[],
     };
     switch (conversionType) {
         case "pdf-to-word": return { ...baseInfo, title: "PDF to Word", actionText: "Convert to Word", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileSignature className="h-10 w-10 text-primary" />, fromType: "PDF", toType: "Word", accept: "application/pdf" };
@@ -172,15 +172,20 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     } catch (error) {
       clearInterval(progressInterval);
       setStatus("error");
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
       console.error(error);
       toast({
         title: "Conversion Error",
-        description: error instanceof Error ? error.message : "An unknown error occurred.",
+        description: errorMessage,
         variant: "destructive",
       });
       setTimeout(() => {
-        setStatus("file-selected");
-      }, 2000);
+         if (files.length > 0) {
+            setStatus("file-selected");
+        } else {
+            resetState();
+        }
+      }, 3000);
     }
   };
 
@@ -192,7 +197,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     a.href = url;
     a.download = convertedFile.name;
     document.body.appendChild(a);
-a.click();
+    a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
@@ -279,7 +284,7 @@ a.click();
                     Remove All
                 </Button>
             )}
-            {files.length === 1 && (
+            {files.length === 1 && !multiple && (
                  <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={resetState} aria-label="Remove file">
                   <X className="h-4 w-4" />
                 </Button>
@@ -333,5 +338,3 @@ a.click();
     );
   }
 }
-
-    

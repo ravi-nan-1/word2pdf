@@ -60,16 +60,13 @@ export async function POST(request: NextRequest) {
       proxyFormData.append('files', file);
     });
 
-    // Handle additional parameters by forwarding them
     const queryParams = new URLSearchParams();
     formData.forEach((value, key) => {
         if (key !== 'files' && key !== 'conversionType') {
              if (typeof value === 'string') {
-                // For endpoints that expect query params, append them
                 if(['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf'].includes(conversionType)) {
                     queryParams.set(key, value);
                 } else {
-                    // For endpoints expecting form data
                     proxyFormData.append(key, value);
                 }
             }
@@ -86,9 +83,7 @@ export async function POST(request: NextRequest) {
         body: proxyFormData,
     };
     
-    // For endpoints that take query parameters, the body might not be FormData
     if (['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf'].includes(conversionType)) {
-       // If only one file is expected, it should be named 'file', not 'files'
        const singleFile = formData.get('files');
        if (singleFile) {
            const singleFileFormData = new FormData();
@@ -111,7 +106,7 @@ export async function POST(request: NextRequest) {
                 const errorJson = JSON.parse(errorBody);
                 errorMessage = errorJson.detail || errorMessage;
             } catch (e) {
-                if (!errorBody.trim().startsWith('<')) {
+                if (errorBody && !errorBody.trim().startsWith('<')) {
                     errorMessage = errorBody;
                 }
             }
@@ -139,5 +134,3 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
-
-    
