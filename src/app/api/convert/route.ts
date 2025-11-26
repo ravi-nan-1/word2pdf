@@ -53,45 +53,29 @@ export async function POST(request: NextRequest) {
     }
 
     const apiEndpoint = getApiEndpoint(conversionType);
-    let apiUrl = `${API_BASE_URL}${apiEndpoint}`;
+    const apiUrl = `${API_BASE_URL}${apiEndpoint}`;
 
     const proxyFormData = new FormData();
+    
+    // For most endpoints, FastAPI expects the key 'files'
+    // For single-file endpoints with parameters, it might expect 'file'
+    const fileKey = ['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf'].includes(conversionType) ? 'file' : 'files';
+    
     files.forEach(file => {
-      proxyFormData.append('files', file);
+      proxyFormData.append(fileKey, file);
     });
 
-    const queryParams = new URLSearchParams();
+    // Append all other form data fields
     formData.forEach((value, key) => {
-        if (key !== 'files' && key !== 'conversionType') {
-             if (typeof value === 'string') {
-                if(['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf'].includes(conversionType)) {
-                    queryParams.set(key, value);
-                } else {
-                    proxyFormData.append(key, value);
-                }
-            }
+        if (key !== 'files' && key !== 'conversionType' && typeof value === 'string') {
+             proxyFormData.append(key, value);
         }
     });
-    
-    const queryString = queryParams.toString();
-    if (queryString) {
-        apiUrl += `?${queryString}`;
-    }
 
     const fetchOptions: RequestInit = {
         method: 'POST',
         body: proxyFormData,
     };
-    
-    if (['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf'].includes(conversionType)) {
-       const singleFile = formData.get('files');
-       if (singleFile) {
-           const singleFileFormData = new FormData();
-           singleFileFormData.append('file', singleFile);
-           fetchOptions.body = singleFileFormData;
-       }
-    }
-
 
     const apiResponse = await fetch(apiUrl, fetchOptions);
 
@@ -104,7 +88,15 @@ export async function POST(request: NextRequest) {
         } else {
             try {
                 const errorJson = JSON.parse(errorBody);
-                errorMessage = errorJson.detail || errorMessage;
+                if (errorJson.detail) {
+                    if(typeof errorJson.detail === 'string') {
+                        errorMessage = errorJson.detail;
+                    } else if (Array.isArray(errorJson.detail) && errorJson.detail[0]?.msg) {
+                         errorMessage = errorJson.detail.map((d: any) => `${d.loc.join(' -> ')}: ${d.msg}`).join(', ');
+                    } else {
+                        errorMessage = JSON.stringify(errorJson.detail);
+                    }
+                }
             } catch (e) {
                 if (errorBody && !errorBody.trim().startsWith('<')) {
                     errorMessage = errorBody;
@@ -134,5 +126,3 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
-
-    
