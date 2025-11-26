@@ -1,17 +1,30 @@
 
 "use client";
 
-import { useState, useMemo, type ChangeEvent } from "react";
+import { useState, useMemo, type ChangeEvent, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage, FileSpreadsheet } from "lucide-react";
+import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage, FileSpreadsheet, Presentation } from "lucide-react";
 
-export type ConversionType = "pdf-to-word" | "word-to-pdf" | "pdf-to-jpg" | "jpg-to-pdf" | "pdf-to-excel";
-type ConversionStatus = "idle" | "uploading" | "converting" | "done" | "error";
+export type ConversionType = 
+  | "pdf-to-word" | "word-to-pdf" 
+  | "pdf-to-jpg" | "jpg-to-pdf" 
+  | "pdf-to-excel" | "excel-to-pdf"
+  | "pdf-to-ppt" | "ppt-to-pdf"
+  | "html-to-pdf"
+  | "merge-pdf" | "split-pdf"
+  | "extract-pages" | "delete-pages"
+  | "reorder-pages" | "rotate-pages"
+  | "watermark-text" | "add-page-numbers"
+  | "protect-pdf" | "unlock-pdf"
+  | "repair-pdf" | "pdf-to-pdfa"
+  | "ocr-pdf" | "edit-pdf";
+
+type ConversionStatus = "idle" | "file-selected" | "uploading" | "converting" | "done" | "error";
 
 interface FileConverterProps {
   conversionType: ConversionType;
@@ -27,15 +40,17 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
 
   const onTabChange = (value: string) => {
     setConversionType(value as ConversionType);
-    resetState();
   };
+  
+  useEffect(() => {
+    resetState();
+  }, [conversionType]);
 
   const resetState = () => {
     setFile(null);
     setStatus("idle");
     setProgress(0);
     setConvertedFile(null);
-    // Also reset the file input element
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -44,79 +59,24 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
 
   const conversionInfo = useMemo(() => {
     switch (conversionType) {
-      case "pdf-to-word":
-        return {
-          title: "PDF to Word",
-          fromIcon: <FileText className="h-10 w-10 text-destructive" />,
-          toIcon: <FileSignature className="h-10 w-10 text-primary" />,
-          fromType: "PDF",
-          toType: "Word",
-          accept: "application/pdf",
-        };
-      case "word-to-pdf":
-        return {
-          title: "Word to PDF",
-          fromIcon: <FileSignature className="h-10 w-10 text-primary" />,
-          toIcon: <FileText className="h-10 w-10 text-destructive" />,
-          fromType: "Word",
-          toType: "PDF",
-          accept: "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword",
-        };
-      case "pdf-to-jpg":
-        return {
-          title: "PDF to JPG",
-          fromIcon: <FileText className="h-10 w-10 text-destructive" />,
-          toIcon: <FileImage className="h-10 w-10 text-primary" />,
-          fromType: "PDF",
-          toType: "JPG",
-          accept: "application/pdf",
-        };
-      case "jpg-to-pdf":
-        return {
-          title: "JPG to PDF",
-          fromIcon: <FileImage className="h-10 w-10 text-primary" />,
-          toIcon: <FileText className="h-10 w-10 text-destructive" />,
-          fromType: "JPG",
-          toType: "PDF",
-          accept: "image/jpeg",
-        };
-      case "pdf-to-excel":
-        return {
-            title: "PDF to Excel",
-            fromIcon: <FileText className="h-10 w-10 text-destructive" />,
-            toIcon: <FileSpreadsheet className="h-10 w-10 text-primary" />,
-            fromType: "PDF",
-            toType: "Excel",
-            accept: "application/pdf",
-        };
-      default:
-        return {
-          title: "PDF to Word",
-          fromIcon: <FileText className="h-10 w-10 text-destructive" />,
-          toIcon: <FileSignature className="h-10 w-10 text-primary" />,
-          fromType: "PDF",
-          toType: "Word",
-          accept: "application/pdf",
-        };
+      case "pdf-to-word": return { title: "PDF to Word", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileSignature className="h-10 w-10 text-primary" />, fromType: "PDF", toType: "Word", accept: "application/pdf" };
+      case "word-to-pdf": return { title: "Word to PDF", fromIcon: <FileSignature className="h-10 w-10 text-primary" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "Word", toType: "PDF", accept: ".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
+      case "pdf-to-jpg": return { title: "PDF to JPG", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileImage className="h-10 w-10 text-primary" />, fromType: "PDF", toType: "JPG", accept: "application/pdf" };
+      case "jpg-to-pdf": return { title: "JPG to PDF", fromIcon: <FileImage className="h-10 w-10 text-primary" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "JPG", toType: "PDF", accept: "image/jpeg" };
+      case "pdf-to-excel": return { title: "PDF to Excel", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileSpreadsheet className="h-10 w-10 text-green-600" />, fromType: "PDF", toType: "Excel", accept: "application/pdf" };
+      case "excel-to-pdf": return { title: "Excel to PDF", fromIcon: <FileSpreadsheet className="h-10 w-10 text-green-600" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "Excel", toType: "PDF", accept: ".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
+      case "pdf-to-ppt": return { title: "PDF to PowerPoint", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <Presentation className="h-10 w-10 text-orange-500" />, fromType: "PDF", toType: "PPT", accept: "application/pdf" };
+      case "ppt-to-pdf": return { title: "PowerPoint to PDF", fromIcon: <Presentation className="h-10 w-10 text-orange-500" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "PPT", toType: "PDF", accept: ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" };
+      case "html-to-pdf": return { title: "HTML to PDF", fromIcon: <FileText className="h-10 w-10 text-blue-500" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "HTML", toType: "PDF", accept: ".html" };
+      default: return { title: "PDF to Word", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileSignature className="h-10 w-10 text-primary" />, fromType: "PDF", toType: "Word", accept: "application/pdf" };
     }
   }, [conversionType]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
-      const allowedTypes = conversionInfo.accept.split(',').map(t => t.trim());
-
-      if (allowedTypes.includes(selectedFile.type)) {
-        setFile(selectedFile);
-        setStatus("uploading");
-      } else {
-        toast({
-          title: "Unsupported File Format",
-          description: `We don't support this file format. Please upload a ${conversionInfo.fromType} file.`,
-          variant: "destructive",
-        });
-        e.target.value = '';
-      }
+      setFile(selectedFile);
+      setStatus("file-selected");
     }
   };
 
@@ -135,7 +95,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
           }
           return prev + 5;
         });
-      }, 100);
+      }, 200);
       return interval;
     };
     const progressInterval = animateProgress();
@@ -151,12 +111,15 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
       });
 
       clearInterval(progressInterval);
-      setProgress(100);
-
+      
       if (!response.ok) {
-        throw new Error(`Conversion failed: ${response.statusText}`);
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || `Conversion failed with status: ${response.status}`;
+        throw new Error(errorMessage);
       }
       
+      setProgress(100);
+
       const blob = await response.blob();
       const contentDisposition = response.headers.get('content-disposition');
       let filename = "converted-file";
@@ -183,9 +146,8 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
         description: error instanceof Error ? error.message : "An unknown error occurred.",
         variant: "destructive",
       });
-      // Allow user to try again
       setTimeout(() => {
-        setStatus("uploading");
+        setStatus("file-selected");
       }, 2000);
     }
   };
@@ -196,7 +158,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     const url = URL.createObjectURL(convertedFile.blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = convertedFile.name;
+a.download = convertedFile.name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -208,7 +170,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     });
   };
 
-  const { title, fromIcon, toIcon, fromType, toType, accept } = conversionInfo;
+  const { title, accept } = conversionInfo;
   
   const isTabbedTool = conversionType === 'pdf-to-word' || conversionType === 'word-to-pdf';
 
@@ -225,13 +187,13 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
               <TabsTrigger value="pdf-to-word">PDF to Word</TabsTrigger>
               <TabsTrigger value="word-to-pdf">Word to PDF</TabsTrigger>
             </TabsList>
-            <TabsContent value={conversionType} className="pt-6">
-              <FileDropZone />
+            <TabsContent value={conversionType} className="pt-6" forceMount>
+               <FileDropZone key={conversionType} />
             </TabsContent>
           </Tabs>
         ) : (
           <div className="pt-6">
-            <FileDropZone />
+            <FileDropZone key={conversionType} />
           </div>
         )}
       </CardContent>
@@ -239,6 +201,8 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   );
 
   function FileDropZone() {
+    const { fromIcon, toIcon, fromType, toType, accept } = conversionInfo;
+
     return (
       <div className="space-y-6">
         <div className="flex justify-center items-center gap-6">
@@ -247,7 +211,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
           {toIcon}
         </div>
 
-        {status === "idle" || status === "uploading" ? (
+        {status === "idle" || status === "file-selected" ? (
           <div className="relative border-2 border-dashed border-border rounded-lg p-10 text-center hover:border-primary transition-colors group">
             <div className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-10 transition-opacity rounded-lg" />
             <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -262,12 +226,11 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
               onChange={handleFileChange}
               accept={accept}
               aria-label={`Upload ${fromType} file`}
-              disabled={status !== 'idle' && status !== 'uploading'}
             />
           </div>
         ) : null}
 
-        {file && (status === "uploading" || status === "converting" || status === "done" || status === 'error') && (
+        {file && (status === "file-selected" || status === "converting" || status === "done" || status === 'error') && (
           <div className="border rounded-lg p-4 flex items-center justify-between bg-secondary/50">
             <div className="flex items-center gap-3 overflow-hidden">
               {fromIcon}
@@ -285,8 +248,8 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
             <p className="text-sm text-muted-foreground animate-pulse">Converting... {progress}%</p>
           </div>
         )}
-
-        {status === "uploading" && (
+        
+        {status === "file-selected" && (
           <Button onClick={handleConvert} className="w-full" size="lg">
             Convert to {toType}
           </Button>
@@ -298,14 +261,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
               <Download className="mr-2 h-4 w-4" />
               Download {toType}
             </Button>
-            <Button onClick={() => {
-              if(isTabbedTool) {
-                resetState();
-              } else {
-                setConversionType('pdf-to-word');
-                resetState();
-              }
-            }} className="w-full" size="lg" variant="outline">
+            <Button onClick={resetState} className="w-full" size="lg" variant="outline">
               Convert Another File
             </Button>
           </div>

@@ -17,36 +17,30 @@ export default function Home() {
 
   const pageHeadings = useMemo(() => {
     switch (conversionType) {
-      case "pdf-to-word":
-        return {
-          title: "Free PDF to Word Converter – Fast, Accurate & No Signup",
-          subtitle: "Convert PDF to Word Online (Fast & Free)"
-        };
-      case "word-to-pdf":
-        return {
-          title: "Free Word to PDF Converter – Simple & Reliable",
-          subtitle: "Convert Word to PDF Online (Fast & Free)"
-        };
-      case "pdf-to-jpg":
-        return {
-          title: "Free PDF to JPG Converter – High Quality Images",
-          subtitle: "Convert PDF to JPG Online (Fast & Free)"
-        };
-      case "jpg-to-pdf":
-        return {
-          title: "Free JPG to PDF Converter – Simple & Secure",
-          subtitle: "Convert JPG to PDF Online (Fast & Free)"
-        };
-      case "pdf-to-excel":
-        return {
-          title: "Free PDF to Excel Converter – Accurate Data Extraction",
-          subtitle: "Convert PDF to Excel Online (Fast & Free)"
-        };
-      default:
-        return {
-          title: "Free PDF to Word Converter – Fast, Accurate & No Signup",
-          subtitle: "Convert PDF to Word Online (Fast & Free)"
-        };
+      case "pdf-to-word": return { title: "Free PDF to Word Converter", subtitle: "Convert PDF to Word Online (Fast & Free)" };
+      case "word-to-pdf": return { title: "Free Word to PDF Converter", subtitle: "Convert Word to PDF Online (Fast & Free)" };
+      case "pdf-to-jpg": return { title: "Free PDF to JPG Converter", subtitle: "Convert PDF to JPG Online (High Quality)" };
+      case "jpg-to-pdf": return { title: "Free JPG to PDF Converter", subtitle: "Convert JPG to PDF Online (Simple & Secure)" };
+      case "pdf-to-excel": return { title: "Free PDF to Excel Converter", subtitle: "Convert PDF to Excel Online (Accurate Data)" };
+      case "excel-to-pdf": return { title: "Free Excel to PDF Converter", subtitle: "Convert Excel to PDF Online (Preserve Formatting)" };
+      case "pdf-to-ppt": return { title: "Free PDF to PowerPoint Converter", subtitle: "Convert PDF to PPT Online" };
+      case "ppt-to-pdf": return { title: "Free PowerPoint to PDF Converter", subtitle: "Convert PPT to PDF Online" };
+      case "html-to-pdf": return { title: "Free HTML to PDF Converter", subtitle: "Convert Webpages to PDF" };
+      case "merge-pdf": return { title: "Merge PDF Files", subtitle: "Combine Multiple PDFs into One" };
+      case "split-pdf": return { title: "Split PDF File", subtitle: "Extract Pages from a PDF" };
+      case "extract-pages": return { title: "Extract Pages from PDF", subtitle: "Select and Save Specific Pages" };
+      case "delete-pages": return { title: "Delete Pages from PDF", subtitle: "Remove Unwanted Pages from a PDF" };
+      case "reorder-pages": return { title: "Reorder PDF Pages", subtitle: "Arrange Pages in Your Desired Order" };
+      case "rotate-pages": return { title: "Rotate PDF Pages", subtitle: "Correct the Orientation of Your Pages" };
+      case "watermark-text": return { title: "Add Watermark to PDF", subtitle: "Stamp Your PDF with Text or an Image" };
+      case "add-page-numbers": return { title: "Add Page Numbers to PDF", subtitle: "Easily Number the Pages of Your PDF" };
+      case "protect-pdf": return { title: "Protect PDF with Password", subtitle: "Encrypt and Secure Your PDF" };
+      case "unlock-pdf": return { title: "Unlock PDF", subtitle: "Remove Password and Restrictions from PDF" };
+      case "repair-pdf": return { title: "Repair PDF", subtitle: "Fix Corrupted or Damaged PDF Files" };
+      case "pdf-to-pdfa": return { title: "Convert to PDF/A", subtitle: "Create Archival-Standard PDFs" };
+      case "ocr-pdf": return { title: "OCR PDF", subtitle: "Make Scanned PDFs Searchable and Editable" };
+      case "edit-pdf": return { title: "Edit PDF", subtitle: "Add Text, Shapes, and Images to a PDF" };
+      default: return { title: "Free PDF Tools", subtitle: "Your Go-To Solution for PDF Management" };
     }
   }, [conversionType]);
 

@@ -1,64 +1,42 @@
-
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { ConversionType } from '@/components/file-converter';
 
-// This is a simplified, in-memory representation of a DOCX file.
-// In a real application, a library like 'docx' would be used to generate this.
-// This buffer creates a minimal but valid DOCX file containing the text "Hello World".
-const createMockDocx = (): Buffer => {
-  // A real DOCX is a zip file containing multiple XML files.
-  // We can't use a zip library here, so we will create a simple text file
-  // that pretends to be a DOCX. Most modern editors will handle this gracefully
-  // as a corrupted file and recover the text. This is better than an empty file.
-  const xmlContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p>
-      <w:r>
-        <w:t>Hello! This is your converted Word document.</w:t>
-      </w:r>
-    </w:p>
-    <w:p>
-      <w:r>
-        <w:t>In a real application, this file would contain the full content of your original PDF.</w:t>
-      </w:r>
-    </w:p>
-  </w:body>
-</w:document>`;
+const API_BASE_URL = 'https://pdf-tools-dljh.onrender.com';
 
-    // We embed the XML inside a basic ZIP-like structure representation.
-    // While not a valid zip, it provides a better mock than a plain text file.
-    const mockDocxContent = `
-PK**********[Content_Types].xml**********...some zip data...
-word/document.xml
-${xmlContent}
-...more zip data...
-`;
-  return Buffer.from(mockDocxContent);
+const getApiEndpoint = (conversionType: ConversionType): string => {
+    const endpointMap: Record<ConversionType, string> = {
+        'pdf-to-word': '/convert/pdf-to-word',
+        'word-to-pdf': '/convert/word-to-pdf',
+        'pdf-to-jpg': '/convert/pdf-to-jpg',
+        'jpg-to-pdf': '/convert/jpg-to-pdf',
+        'pdf-to-excel': '/convert/pdf-to-excel',
+        'excel-to-pdf': '/convert/excel-to-pdf',
+        'pdf-to-ppt': '/convert/pdf-to-ppt',
+        'ppt-to-pdf': '/convert/ppt-to-pdf',
+        'html-to-pdf': '/convert/html-to-pdf',
+        'merge-pdf': '/tools/merge',
+        'split-pdf': '/tools/split',
+        'extract-pages': '/tools/extract',
+        'delete-pages': '/tools/delete-pages',
+        'reorder-pages': '/tools/reorder',
+        'rotate-pages': '/tools/rotate',
+        'watermark-text': '/tools/watermark-text',
+        'add-page-numbers': '/tools/add-page-numbers',
+        'protect-pdf': '/tools/protect',
+        'unlock-pdf': '/tools/unlock',
+        'repair-pdf': '/tools/repair',
+        'pdf-to-pdfa': '/tools/pdfa',
+        'ocr-pdf': '/tools/ocr',
+        'edit-pdf': '/tools/edit/add-text', // Or another appropriate edit endpoint
+    };
+
+    if (!endpointMap[conversionType]) {
+        throw new Error('Invalid conversion type specified');
+    }
+
+    return endpointMap[conversionType];
 };
-
-const getTargetExtension = (conversionType: ConversionType): string => {
-    switch(conversionType) {
-        case "pdf-to-word": return ".docx";
-        case "word-to-pdf": return ".pdf";
-        case "pdf-to-jpg": return ".jpg";
-        case "jpg-to-pdf": return ".pdf";
-        case "pdf-to-excel": return ".xlsx";
-        default: throw new Error("Invalid conversion type");
-    }
-}
-
-const getMimeType = (extension: string): string => {
-    switch(extension) {
-        case ".docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        case ".pdf": return "application/pdf";
-        case ".jpg": return "image/jpeg";
-        case ".xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        default: return "application/octet-stream";
-    }
-}
-
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,40 +45,71 @@ export async function POST(request: NextRequest) {
     const conversionType = formData.get('conversionType') as ConversionType | null;
 
     if (!file) {
-      return new NextResponse('No file uploaded', { status: 400 });
+      return new NextResponse(JSON.stringify({ message: 'No file uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
     if (!conversionType) {
-      return new NextResponse('No conversion type specified', { status: 400 });
+      return new NextResponse(JSON.stringify({ message: 'No conversion type specified' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // In a real application, this is where you would use the tools from the user's guide.
-    // For example, for 'pdf-to-word', you would execute:
-    // `exec('soffice --headless --convert-to docx ...')`
-    console.log(`Simulating conversion for: ${conversionType}`);
-    console.log(`Uploaded file: ${file.name}, size: ${file.size}`);
-    console.log("This would be the place to call a command-line tool like LibreOffice or Ghostscript.");
+    const apiEndpoint = getApiEndpoint(conversionType);
+    const apiUrl = `${API_BASE_URL}${apiEndpoint}`;
 
-    // Simulate a delay for conversion
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const proxyFormData = new FormData();
+    proxyFormData.append('file', file);
     
-    // Simulate file conversion by creating a mock file buffer
-    // For now, we'll just return a mock DOCX for any conversion to prove the flow.
-    const mockFileBuffer = createMockDocx(); 
-    const targetExtension = getTargetExtension(conversionType);
-    const newFileName = file.name.replace(/\.[^/.]+$/, "") + targetExtension;
-    const mimeType = getMimeType(targetExtension);
+    // For endpoints that require more than one file, like 'merge-pdf'
+    // The logic would need to be expanded to handle multiple files.
+    // For now, we assume single file uploads.
+    
+    const fetchOptions: RequestInit = {
+        method: 'POST',
+        body: proxyFormData,
+        // It's important to not set the 'Content-Type' header manually when using FormData,
+        // as the browser or fetch API will set it with the correct boundary.
+    };
+    
+    const apiResponse = await fetch(apiUrl, fetchOptions);
 
-    return new NextResponse(mockFileBuffer, {
+    if (!apiResponse.ok) {
+        // Try to parse the error from the backend service
+        const errorBody = await apiResponse.text();
+        let errorMessage = `API request failed with status ${apiResponse.status}`;
+
+        // Check if the Render service is spinning up
+        if (apiResponse.status === 502 && errorBody.includes('Web service is not available')) {
+             errorMessage = 'The conversion service is starting up. Please try again in a few moments.';
+        } else {
+            try {
+                const errorJson = JSON.parse(errorBody);
+                errorMessage = errorJson.detail || errorMessage;
+            } catch (e) {
+                // If the error is not JSON, use the raw text if it's not HTML
+                if (!errorBody.trim().startsWith('<')) {
+                    errorMessage = errorBody;
+                }
+            }
+        }
+        
+        return new NextResponse(JSON.stringify({ message: errorMessage }), { status: apiResponse.status, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // Stream the response from the FastAPI backend to the client
+    const headers = new Headers();
+    headers.set('Content-Type', apiResponse.headers.get('Content-Type') || 'application/octet-stream');
+    headers.set('Content-Disposition', apiResponse.headers.get('Content-Disposition') || `attachment; filename="converted-file"`);
+    
+    if (!apiResponse.body) {
+         return new NextResponse(JSON.stringify({ message: 'The conversion service returned an empty response.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    return new NextResponse(apiResponse.body, {
       status: 200,
-      headers: {
-        'Content-Type': mimeType,
-        'Content-Disposition': `attachment; filename="${newFileName}"`,
-      },
+      headers: headers,
     });
 
   } catch (error) {
-    console.error('Conversion API error:', error);
+    console.error('Proxy API error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500 });
+    return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
