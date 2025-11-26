@@ -62,7 +62,7 @@ const getConversionInfo = (conversionType: ConversionType) => {
         case "repair-pdf": return { ...baseInfo, title: "Repair PDF", actionText: "Repair PDF", fromType: "PDF", toType: "PDF" };
         case "pdf-to-pdfa": return { ...baseInfo, title: "Convert to PDF/A", actionText: "Convert", fromType: "PDF", toType: "PDF/A" };
         case "ocr-pdf": return { ...baseInfo, title: "OCR PDF", actionText: "Perform OCR", fromType: "PDF", toType: "PDF" };
-        case "edit-pdf": return { ...baseInfo, title: "Edit PDF", actionText: "Add Text to PDF", fromType: "PDF", toType: "PDF", params: [{ id: 'text', label: 'Text to add', type: 'text' }, {id: 'x', label: 'X coordinate', type: 'number'}, {id: 'y', label: 'Y coordinate', type: 'number'}] };
+        case "edit-pdf": return { ...baseInfo, title: "Edit PDF", actionText: "Add Text to PDF", fromType: "PDF", toType: "PDF", params: [{ id: 'text', label: 'Text to add', type: 'text' }, { id: 'page', label: 'Page number', type: 'number' }, {id: 'x', label: 'X coordinate', type: 'number'}, {id: 'y', label: 'Y coordinate', type: 'number'}, {id: 'fontsize', label: 'Font size', type: 'number'}] };
         default: return { ...baseInfo, title: "PDF to Word", actionText: "Convert to Word", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileSignature className="h-10 w-10 text-primary" />, fromType: "PDF", toType: "Word" };
     }
 };
@@ -163,7 +163,7 @@ function FileDropZone({
                             <SelectValue placeholder={param.label} />
                           </SelectTrigger>
                           <SelectContent>
-                            {param.options.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            {param.options?.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       ) : (
@@ -230,6 +230,11 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
       if (param.id === 'position') newParams[param.id] = 'bottom-center';
       if (param.id === 'margin') newParams[param.id] = '10';
       if (param.id === 'pages') newParams[param.id] = 'all';
+      if (param.id === 'page') newParams[param.id] = '1';
+      if (param.id === 'x') newParams[param.id] = '100';
+      if (param.id === 'y') newParams[param.id] = '100';
+      if (param.id === 'text') newParams[param.id] = 'Your Text Here';
+      if (param.id === 'fontsize') newParams[param.id] = '12';
     });
     setAdditionalParams(newParams);
   }, [conversionType]);
@@ -430,5 +435,3 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     </Card>
   );
 }
-
-    
