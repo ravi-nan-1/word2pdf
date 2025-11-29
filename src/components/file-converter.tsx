@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage, FileSpreadsheet, Presentation, FileCode } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
+import { cn } from "@/lib/utils";
 
 export type ConversionType = 
   | "pdf-to-word" | "word-to-pdf" 
@@ -102,6 +103,21 @@ function FileDropZone({
   setHtmlContent: (content: string) => void;
 }) {
   const { fromIcon, toIcon, fromType, actionText, accept, multiple, params } = conversionInfo;
+  
+  const handleLocalFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setHtmlContent(""); // Clear text content if a file is selected
+    }
+    handleFileChange(e);
+  };
+
+  const handleLocalHtmlChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const content = e.target.value;
+    if (content) {
+      setFiles([]); // Clear file if text is entered
+    }
+    setHtmlContent(content);
+  }
 
   const renderHtmlToPdfInputs = () => (
     <div className="space-y-6">
@@ -115,9 +131,10 @@ function FileDropZone({
         fromType={fromType} 
         accept={accept} 
         multiple={false} 
-        handleFileChange={handleFileChange} 
+        handleFileChange={handleLocalFileChange} 
         files={files}
         status={status}
+        disabled={!!htmlContent}
       />
        {files.length > 0 && (
         <FilePreview files={files} fromIcon={fromIcon} onRemove={resetState} isSingle={true} />
@@ -136,7 +153,7 @@ function FileDropZone({
         placeholder="Paste your HTML code here"
         className="h-48"
         value={htmlContent}
-        onChange={(e) => setHtmlContent(e.target.value)}
+        onChange={handleLocalHtmlChange}
         disabled={files.length > 0}
       />
     </div>
@@ -158,6 +175,7 @@ function FileDropZone({
             handleFileChange={handleFileChange}
             files={files}
             status={status}
+            disabled={false}
           />
       )}
 
@@ -212,8 +230,8 @@ function FileDropZone({
         </div>
       )}
       
-      {(status === "file-selected" || (conversionType === 'html-to-pdf' && htmlContent && files.length === 0)) && (
-        <Button onClick={handleConvert} className="w-full" size="lg" disabled={status === 'converting'}>
+      {(status === "file-selected") && (
+        <Button onClick={handleConvert} className="w-full" size="lg" disabled={status === 'converting' || (files.length === 0 && !htmlContent)}>
           {actionText}
         </Button>
       )}
@@ -233,19 +251,24 @@ function FileDropZone({
   );
 }
 
-function FileDropZoneCore({ fromType, accept, multiple, handleFileChange, files, status }: {
+function FileDropZoneCore({ fromType, accept, multiple, handleFileChange, files, status, disabled }: {
   fromType: string;
   accept: string;
   multiple: boolean;
   handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
   files: File[];
   status: ConversionStatus;
+  disabled: boolean;
 }) {
   if (status !== 'idle' && status !== 'file-selected') return null;
   if (files.length > 0 && !multiple) return null;
 
+  const baseClasses = "relative border-2 border-dashed border-border rounded-lg p-10 text-center transition-colors group";
+  const enabledClasses = "hover:border-primary";
+  const disabledClasses = "bg-secondary/50 cursor-not-allowed opacity-50";
+
   return (
-    <div className="relative border-2 border-dashed border-border rounded-lg p-10 text-center hover:border-primary transition-colors group">
+    <div className={cn(baseClasses, disabled ? disabledClasses : enabledClasses)}>
       <div className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-10 transition-opacity rounded-lg" />
       <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
       <p className="mt-4 font-semibold text-foreground">
@@ -260,6 +283,7 @@ function FileDropZoneCore({ fromType, accept, multiple, handleFileChange, files,
         accept={accept}
         multiple={multiple}
         aria-label={`Upload ${fromType} file`}
+        disabled={disabled}
       />
     </div>
   );
@@ -318,6 +342,14 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   useEffect(() => {
     resetState();
   }, [conversionType]);
+  
+  useEffect(() => {
+    if (files.length > 0 || htmlContent) {
+        setStatus('file-selected');
+    } else {
+        setStatus('idle');
+    }
+  }, [files, htmlContent]);
 
   const resetState = () => {
     setFiles([]);
@@ -348,21 +380,11 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
       setFiles(selectedFiles);
-      setHtmlContent("");
-      setStatus("file-selected");
     }
   };
   
   const handleHtmlContentChange = (content: string) => {
     setHtmlContent(content);
-    if(content) {
-      setFiles([]);
-      setStatus('file-selected');
-    } else {
-      if (files.length === 0) {
-        setStatus('idle');
-      }
-    }
   }
 
   const handleParamChange = (id: string, value: string) => {
@@ -370,8 +392,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   };
 
   const handleConvert = async () => {
-    if (conversionType !== 'html-to-pdf' && files.length === 0) return;
-    if (conversionType === 'html-to-pdf' && files.length === 0 && !htmlContent) return;
+    if (files.length === 0 && !htmlContent) return;
 
     setStatus("converting");
     setProgress(0);
@@ -392,19 +413,19 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
 
     try {
       const formData = new FormData();
+      formData.append("conversionType", conversionType);
+
       if (conversionType === 'html-to-pdf') {
-        if(htmlContent) {
-          formData.append("html", htmlContent);
-        }
-        if(files.length > 0) {
+        if (files.length > 0) {
           formData.append("file", files[0]);
+        } else if (htmlContent) {
+          formData.append("html", htmlContent);
         }
       } else {
         files.forEach((file) => {
             formData.append("files", file);
         });
       }
-      formData.append("conversionType", conversionType);
 
       for (const key in additionalParams) {
         formData.append(key, additionalParams[key]);

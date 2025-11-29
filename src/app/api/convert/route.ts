@@ -42,49 +42,56 @@ const getApiEndpoint = (conversionType: ConversionType): string => {
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
     const conversionType = formData.get('conversionType') as ConversionType | null;
 
     if (!conversionType) {
       return new NextResponse(JSON.stringify({ message: 'No conversion type specified' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
     
-    if (conversionType !== 'html-to-pdf' && !files?.length) {
-       if (!formData.get('html')) {
-          return new NextResponse(JSON.stringify({ message: 'No files uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-       }
-    }
-
     const apiEndpoint = getApiEndpoint(conversionType);
     const apiUrl = `${API_BASE_URL}${apiEndpoint}`;
 
     const proxyFormData = new FormData();
-    
-    const singleFileTools: ConversionType[] = [
-      'word-to-pdf', 'pdf-to-jpg', 'excel-to-pdf', 'ppt-to-pdf', 'split-pdf',
-      'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages',
-      'watermark-text', 'protect-pdf', 'unlock-pdf', 'repair-pdf', 'pdf-to-pdfa',
-      'ocr-pdf', 'edit-pdf', 'add-page-numbers', 'pdf-to-word', 'pdf-to-excel', 'pdf-to-ppt'
-    ];
+    let hasContent = false;
 
+    // Handle HTML to PDF separately
     if (conversionType === 'html-to-pdf') {
         const htmlFile = formData.get('file') as File | null;
+        const htmlContent = formData.get('html') as string | null;
+
         if (htmlFile) {
             proxyFormData.append('file', htmlFile);
+            hasContent = true;
+        } else if (htmlContent) {
+            proxyFormData.append('html', htmlContent);
+            hasContent = true;
         }
     } else {
-        const isSingle = singleFileTools.includes(conversionType);
-        const fileKey = isSingle ? 'file' : 'files';
-        const filesToAppend = isSingle ? files.slice(0, 1) : files;
-
-        filesToAppend.forEach(file => {
-          proxyFormData.append(fileKey, file);
-        });
+        const files = formData.getAll('files') as File[];
+        if (files.length > 0) {
+            hasContent = true;
+            const singleFileTools: ConversionType[] = [
+              'word-to-pdf', 'pdf-to-jpg', 'excel-to-pdf', 'ppt-to-pdf', 'split-pdf',
+              'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages',
+              'watermark-text', 'protect-pdf', 'unlock-pdf', 'repair-pdf', 'pdf-to-pdfa',
+              'ocr-pdf', 'edit-pdf', 'add-page-numbers', 'pdf-to-word', 'pdf-to-excel', 'pdf-to-ppt'
+            ];
+            const isSingle = singleFileTools.includes(conversionType);
+            const fileKey = isSingle ? 'file' : 'files';
+            const filesToAppend = isSingle ? files.slice(0, 1) : files;
+            filesToAppend.forEach(file => {
+              proxyFormData.append(fileKey, file);
+            });
+        }
+    }
+    
+    if (!hasContent) {
+         return new NextResponse(JSON.stringify({ message: 'No file or content provided' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // Append all other form data fields
+    // Append all other form data fields that are not files or special keys
     formData.forEach((value, key) => {
-        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && typeof value === 'string') {
+        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && key !== 'html') {
              proxyFormData.append(key, value);
         }
     });
