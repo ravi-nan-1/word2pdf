@@ -60,21 +60,22 @@ export async function POST(request: NextRequest) {
 
     const proxyFormData = new FormData();
     
-    const multiFileTools: ConversionType[] = ['jpg-to-pdf', 'merge-pdf'];
-    
+    const singleFileTools: ConversionType[] = [
+      'word-to-pdf', 'pdf-to-jpg', 'excel-to-pdf', 'ppt-to-pdf', 'split-pdf',
+      'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages',
+      'watermark-text', 'protect-pdf', 'unlock-pdf', 'repair-pdf', 'pdf-to-pdfa',
+      'ocr-pdf', 'edit-pdf', 'add-page-numbers', 'pdf-to-word', 'pdf-to-excel', 'pdf-to-ppt'
+    ];
+
     if (conversionType === 'html-to-pdf') {
         const htmlFile = formData.get('file') as File | null;
-        const htmlContent = formData.get('html') as string | null;
         if (htmlFile) {
             proxyFormData.append('file', htmlFile);
         }
-        if (htmlContent) {
-            proxyFormData.append('html', htmlContent);
-        }
     } else {
-        const isMulti = multiFileTools.includes(conversionType);
-        const fileKey = isMulti ? 'files' : 'file';
-        const filesToAppend = isMulti ? files : files.slice(0, 1);
+        const isSingle = singleFileTools.includes(conversionType);
+        const fileKey = isSingle ? 'file' : 'files';
+        const filesToAppend = isSingle ? files.slice(0, 1) : files;
 
         filesToAppend.forEach(file => {
           proxyFormData.append(fileKey, file);
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // Append all other form data fields
     formData.forEach((value, key) => {
-        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && key !== 'html' && typeof value === 'string') {
+        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && typeof value === 'string') {
              proxyFormData.append(key, value);
         }
     });
