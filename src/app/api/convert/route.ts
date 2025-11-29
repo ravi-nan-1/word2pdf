@@ -43,9 +43,10 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
+    const htmlFile = formData.get('file') as File | null;
     const conversionType = formData.get('conversionType') as ConversionType | null;
 
-    if (conversionType !== 'html-to-pdf' && (!files || files.length === 0)) {
+    if (conversionType !== 'html-to-pdf' && !files?.length && !htmlFile) {
       return new NextResponse(JSON.stringify({ message: 'No files uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
     if (!conversionType) {
@@ -57,28 +58,31 @@ export async function POST(request: NextRequest) {
 
     const proxyFormData = new FormData();
     
-    // This list now contains ALL tools that expect a single file.
     const singleFileTools: ConversionType[] = [
         'word-to-pdf', 'excel-to-pdf', 'ppt-to-pdf',
         'pdf-to-word', 'pdf-to-excel', 'pdf-to-ppt', 'pdf-to-jpg', 
         'split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 
         'rotate-pages', 'watermark-text', 'add-page-numbers', 
         'protect-pdf', 'unlock-pdf', 'edit-pdf', 
-        'repair-pdf', 'pdf-to-pdfa', 'ocr-pdf'
+        'repair-pdf', 'pdf-to-pdfa', 'ocr-pdf', 'html-to-pdf'
     ];
     
-    // For html-to-pdf, we don't deal with files from the user
-    if (conversionType !== 'html-to-pdf') {
+    if (conversionType === 'html-to-pdf') {
+        if (htmlFile) {
+            proxyFormData.append('file', htmlFile);
+        }
+    } else {
         const fileKey = singleFileTools.includes(conversionType) ? 'file' : 'files';
-        
-        files.forEach(file => {
+        const filesToAppend = fileKey === 'file' ? files.slice(0,1) : files;
+
+        filesToAppend.forEach(file => {
           proxyFormData.append(fileKey, file);
         });
     }
 
     // Append all other form data fields
     formData.forEach((value, key) => {
-        if (key !== 'files' && key !== 'conversionType' && typeof value === 'string') {
+        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && typeof value === 'string') {
              proxyFormData.append(key, value);
         }
     });
@@ -137,3 +141,5 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
+
+    

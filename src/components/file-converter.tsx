@@ -103,102 +103,79 @@ function FileDropZone({
 }) {
   const { fromIcon, toIcon, fromType, actionText, accept, multiple, params } = conversionInfo;
 
-  if (conversionType === 'html-to-pdf') {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-center items-center gap-6">
-          {fromIcon}
-          <ArrowRight className="h-8 w-8 text-muted-foreground" />
-          {toIcon}
-        </div>
-        <Textarea
-          placeholder="Paste your HTML code here"
-          className="h-48"
-          value={htmlContent}
-          onChange={(e) => setHtmlContent(e.target.value)}
-        />
-        {status === 'converting' && (
-          <div className="space-y-2 text-center">
-            <Progress value={progress} className="w-full" />
-            <p className="text-sm text-muted-foreground animate-pulse">Converting... {progress}%</p>
-          </div>
-        )}
-        {(status === "idle" || status === "file-selected" || status === "error") && htmlContent && (
-            <Button onClick={handleConvert} className="w-full" size="lg">
-              {actionText}
-            </Button>
-        )}
-        {status === "done" && (
-          <div className="grid gap-4 sm:grid-cols-2">
-             <Button onClick={handleDownload} className="w-full" size="lg">
-              <Download className="mr-2 h-4 w-4" />
-              Download File
-            </Button>
-            <Button onClick={resetState} className="w-full" size="lg" variant="outline">
-              Convert Another
-            </Button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-
-  return (
+  const renderHtmlToPdfInputs = () => (
     <div className="space-y-6">
       <div className="flex justify-center items-center gap-6">
         {fromIcon}
         <ArrowRight className="h-8 w-8 text-muted-foreground" />
         {toIcon}
       </div>
-
-      {status === "idle" || status === "file-selected" ? (
-        <div className="relative border-2 border-dashed border-border rounded-lg p-10 text-center hover:border-primary transition-colors group">
-          <div className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-10 transition-opacity rounded-lg" />
-          <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-          <p className="mt-4 font-semibold text-foreground">
-            Drop your {fromType} file{multiple ? 's' : ''} here
-          </p>
-          <p className="text-sm text-muted-foreground">or click to browse</p>
-          <Input
-            id="file-upload"
-            type="file"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            onChange={handleFileChange}
-            accept={accept}
-            multiple={multiple}
-            aria-label={`Upload ${fromType} file`}
-          />
+      
+      <FileDropZoneCore 
+        fromType={fromType} 
+        accept={accept} 
+        multiple={false} 
+        handleFileChange={handleFileChange} 
+        files={files}
+        status={status}
+      />
+       {files.length > 0 && (
+        <FilePreview files={files} fromIcon={fromIcon} onRemove={resetState} isSingle={true} />
+       )}
+      
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
         </div>
-      ) : null}
+        <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">Or Paste Code</span>
+        </div>
+      </div>
+
+      <Textarea
+        placeholder="Paste your HTML code here"
+        className="h-48"
+        value={htmlContent}
+        onChange={(e) => setHtmlContent(e.target.value)}
+        disabled={files.length > 0}
+      />
+    </div>
+  );
+
+  const renderDefaultInputs = () => (
+     <div className="space-y-6">
+      <div className="flex justify-center items-center gap-6">
+        {fromIcon}
+        <ArrowRight className="h-8 w-8 text-muted-foreground" />
+        {toIcon}
+      </div>
+
+      {(status === "idle" || status === "file-selected") && (
+          <FileDropZoneCore 
+            fromType={fromType} 
+            accept={accept} 
+            multiple={multiple} 
+            handleFileChange={handleFileChange}
+            files={files}
+            status={status}
+          />
+      )}
 
       {files.length > 0 && (status === "file-selected" || status === "converting" || status === "done" || status === 'error') && (
-        <div className="border rounded-lg p-4 space-y-2 bg-secondary/50 relative">
-           {files.map((file, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center gap-3 overflow-hidden">
-                  {fromIcon}
-                  <span className="font-medium text-sm truncate">{file.name}</span>
-              </div>
-               {!multiple && (
-                 <Button variant="ghost" size="icon" onClick={() => setFiles(files.filter((_, i) => i !== index))} aria-label="Remove file">
-                  <X className="h-4 w-4" />
-                </Button>
-               )}
-            </div>
-          ))}
-           {files.length > 1 && (
-               <Button variant="ghost" size="sm" onClick={resetState} className="w-full">
-                  Remove All
-              </Button>
-          )}
-          {files.length === 1 && !multiple && (
-               <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={resetState} aria-label="Remove file">
-                <X className="h-4 w-4" />
-              </Button>
-          )}
-        </div>
+         <FilePreview files={files} fromIcon={fromIcon} onRemove={(index) => {
+            if (multiple) {
+                setFiles(files.filter((_, i) => i !== index));
+            } else {
+                resetState();
+            }
+         }} isSingle={!multiple} />
       )}
+     </div>
+  );
+
+  return (
+    <div className="space-y-6">
+       {conversionType === 'html-to-pdf' ? renderHtmlToPdfInputs() : renderDefaultInputs()}
 
       {status === "file-selected" && params && params.length > 0 && (
           <div className="grid gap-4">
@@ -235,8 +212,8 @@ function FileDropZone({
         </div>
       )}
       
-      {status === "file-selected" && files.length > 0 && (
-        <Button onClick={handleConvert} className="w-full" size="lg">
+      {(status === "file-selected" || (conversionType === 'html-to-pdf' && htmlContent && files.length === 0)) && (
+        <Button onClick={handleConvert} className="w-full" size="lg" disabled={status === 'converting'}>
           {actionText}
         </Button>
       )}
@@ -248,7 +225,7 @@ function FileDropZone({
             Download File
           </Button>
           <Button onClick={resetState} className="w-full" size="lg" variant="outline">
-            Convert Another File
+            Convert Another
           </Button>
         </div>
       )}
@@ -256,6 +233,72 @@ function FileDropZone({
   );
 }
 
+function FileDropZoneCore({ fromType, accept, multiple, handleFileChange, files, status }: {
+  fromType: string;
+  accept: string;
+  multiple: boolean;
+  handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  files: File[];
+  status: ConversionStatus;
+}) {
+  if (status !== 'idle' && status !== 'file-selected') return null;
+  if (files.length > 0 && !multiple) return null;
+
+  return (
+    <div className="relative border-2 border-dashed border-border rounded-lg p-10 text-center hover:border-primary transition-colors group">
+      <div className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-10 transition-opacity rounded-lg" />
+      <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
+      <p className="mt-4 font-semibold text-foreground">
+        Drop your {fromType} file{multiple ? 's' : ''} here
+      </p>
+      <p className="text-sm text-muted-foreground">or click to browse</p>
+      <Input
+        id="file-upload"
+        type="file"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        onChange={handleFileChange}
+        accept={accept}
+        multiple={multiple}
+        aria-label={`Upload ${fromType} file`}
+      />
+    </div>
+  );
+}
+
+function FilePreview({ files, fromIcon, onRemove, isSingle }: {
+  files: File[];
+  fromIcon: React.ReactNode;
+  onRemove: (index: number) => void;
+  isSingle: boolean;
+}) {
+  return (
+     <div className="border rounded-lg p-4 space-y-2 bg-secondary/50 relative">
+        {files.map((file, index) => (
+            <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center gap-3 overflow-hidden">
+                    {fromIcon}
+                    <span className="font-medium text-sm truncate">{file.name}</span>
+                </div>
+                {!isSingle ? (
+                 <Button variant="ghost" size="icon" onClick={() => onRemove(index)} aria-label="Remove file">
+                  <X className="h-4 w-4" />
+                </Button>
+               ) : null}
+            </div>
+        ))}
+        {isSingle && files.length > 0 && (
+             <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => onRemove(0)} aria-label="Remove file">
+              <X className="h-4 w-4" />
+            </Button>
+        )}
+        {!isSingle && files.length > 1 && (
+             <Button variant="ghost" size="sm" onClick={() => files.forEach((_, i) => onRemove(i))} className="w-full">
+                Remove All
+            </Button>
+        )}
+      </div>
+  )
+}
 
 export function FileConverter({ conversionType, setConversionType }: FileConverterProps) {
   const [files, setFiles] = useState<File[]>([]);
@@ -305,17 +348,30 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
       setFiles(selectedFiles);
+      setHtmlContent("");
       setStatus("file-selected");
     }
   };
   
+  const handleHtmlContentChange = (content: string) => {
+    setHtmlContent(content);
+    if(content) {
+      setFiles([]);
+      setStatus('file-selected');
+    } else {
+      if (files.length === 0) {
+        setStatus('idle');
+      }
+    }
+  }
+
   const handleParamChange = (id: string, value: string) => {
     setAdditionalParams(prev => ({...prev, [id]: value}));
   };
 
   const handleConvert = async () => {
-    if (conversionType !== 'html-to-pdf' && !files.length) return;
-    if (conversionType === 'html-to-pdf' && !htmlContent) return;
+    if (conversionType !== 'html-to-pdf' && files.length === 0) return;
+    if (conversionType === 'html-to-pdf' && files.length === 0 && !htmlContent) return;
 
     setStatus("converting");
     setProgress(0);
@@ -337,7 +393,12 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     try {
       const formData = new FormData();
       if (conversionType === 'html-to-pdf') {
-        formData.append("html", htmlContent);
+        if(htmlContent) {
+          formData.append("html", htmlContent);
+        }
+        if(files.length > 0) {
+          formData.append("file", files[0]);
+        }
       } else {
         files.forEach((file) => {
             formData.append("files", file);
@@ -460,7 +521,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
         resetState={resetState}
         setFiles={setFiles}
         htmlContent={htmlContent}
-        setHtmlContent={setHtmlContent}
+        setHtmlContent={handleHtmlContentChange}
       />
     </div>
   );
@@ -492,3 +553,5 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
     </Card>
   );
 }
+
+    
