@@ -59,7 +59,13 @@ export default function AboutPage() {
         <div className="space-x-4">
             <Link href="/" className="hover:underline">Home</Link>
             <span>|</span>
-            <Link href="/about" className="hover:underline">About Us</Link>
+            <Link href="/about" className="hover:underline">About</Link>
+            <span>|</span>
+            <Link href="/contact" className="hover:underline">Contact</Link>
+            <span>|</span>
+            <Link href="/privacy-policy" className="hover:underline">Privacy Policy</Link>
+            <span>|</span>
+            <Link href="/terms-of-use" className="hover:underline">Terms of Use</Link>
         </div>
         <p className="mt-2">© {new Date().getFullYear()} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
       </footer>
