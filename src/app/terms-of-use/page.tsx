@@ -7,43 +7,105 @@ import { useState, useEffect } from 'react';
 
 export default function TermsOfUsePage() {
   const [date, setDate] = useState('');
+  const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    setDate(new Date().toLocaleDateString());
+    setDate('30 November 2025');
+    setYear(new Date().getFullYear());
   }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-background dark:bg-black">
       <Header />
       <main className="flex-1 flex flex-col items-center p-4">
-        <div className="w-full max-w-4xl mx-auto py-12 px-4 space-y-8 prose dark:prose-invert lg:prose-xl">
-            <h1>Terms of Use</h1>
-            <p>Last updated: {date}</p>
-            
-            <p>Please read these Terms of Use ("Terms", "Terms of Use") carefully before using the PDF2Word website (the "Service") operated by PDF2Word ("us", "we", or "our").</p>
-            
-            <p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users, and others who access or use the Service.</p>
-            
-            <h2>Service Provision</h2>
-            <p>Our Service provides a free online tool to convert files. You agree not to use the service for any illegal purposes. You are responsible for the content of the files you upload.</p>
-            
-            <h2>Intellectual Property</h2>
-            <p>The Service and its original content, features, and functionality are and will remain the exclusive property of PDF2Word and its licensors. You do not acquire any ownership rights to the content you convert.</p>
-            
-            <h2>Disclaimer</h2>
-            <p>Our Service is provided on an "AS IS" and "AS AVAILABLE" basis. We do not warrant that the results of the conversion will be accurate or reliable. You use the service at your own risk.</p>
-            
-            <h2>Limitation of Liability</h2>
-            <p>In no event shall PDF2Word, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
-            
-            <h2>Governing Law</h2>
-            <p>These Terms shall be governed and construed in accordance with the laws of the jurisdiction in which the company is based, without regard to its conflict of law provisions.</p>
-            
-            <h2>Changes</h2>
-            <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. What constitutes a material change will be determined at our sole discretion.</p>
-            
-            <h2>Contact Us</h2>
-            <p>If you have any questions about these Terms, please contact us at <a href="mailto:support@all2ools.com" className="text-primary underline">support@all2ools.com</a>.</p>
+        <div className="w-full max-w-4xl mx-auto py-12 px-4 space-y-12">
+            <header className="text-center">
+                <h1 className="text-4xl md:text-5xl font-bold font-headline mb-4">Terms of Use</h1>
+                <p className="text-muted-foreground">Last updated: {date}</p>
+            </header>
+
+            <p className="text-lg text-center text-muted-foreground">These Terms of Use (“Terms”) govern your access to and use of any online tools, services, or websites operated under All2ools.com and its subdomains (collectively, the “Service”). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree with any part of these Terms, please discontinue use of the Service.</p>
+
+            <div className="space-y-8">
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟦</span> Description of Service</h2>
+                  <p className="text-muted-foreground mb-4">All2ools provides free online tools, including (but not limited to):</p>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>PDF converters (PDF to Word, Word to PDF, Merge PDF, etc.)</li>
+                      <li>Image tools (compressor, converter, optimizer, editor)</li>
+                      <li>QR code generator & URL shortener</li>
+                      <li>AI Tutor & text tools</li>
+                      <li>Excel utilities & Summary tools</li>
+                      <li>Other file utilities</li>
+                  </ul>
+                  <p className="text-muted-foreground mt-4">The Service does not require registration and is provided “as is.”</p>
+              </section>
+
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟩</span> File Upload & Processing</h2>
+                   <p className="text-muted-foreground mb-4">For tools that involve uploading files:</p>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>Files are processed temporarily only to complete the requested action.</li>
+                      <li>All uploaded files are automatically and permanently deleted within 1 hour.</li>
+                      <li>Files are not stored, reviewed, or shared.</li>
+                      <li>You are responsible for ensuring the files you upload do not violate any law or copyright.</li>
+                      <li>You retain full ownership of your files.</li>
+                  </ul>
+              </section>
+              
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟧</span> Acceptable Use</h2>
+                  <p className="text-muted-foreground mb-4">You agree NOT to use the Service for:</p>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                      <li>Illegal activities</li>
+                      <li>Uploading harmful, abusive, or malicious content</li>
+                      <li>Distributing malware, viruses, or harmful scripts</li>
+                      <li>Infringing copyrights or intellectual property</li>
+                      <li>Reverse engineering, scraping, or abusing any API</li>
+                      <li>Overloading the system or bypassing security measures</li>
+                  </ul>
+                   <p className="text-muted-foreground mt-4">We may restrict access for violations of these terms.</p>
+              </section>
+
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟨</span> Intellectual Property</h2>
+                  <p className="text-muted-foreground mb-4">All2ools owns the website design, branding, software, tool functionality, logos, trademarks, written content, and UI/UX layout. You do not acquire any rights to our intellectual property by using the Service. Uploaded files remain your property.</p>
+              </section>
+
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟥</span> Disclaimer of Warranties</h2>
+                  <p className="text-muted-foreground">The Service is provided “AS IS” and “AS AVAILABLE.” All2ools makes no guarantees that the Service will be error-free, that file conversions will always be accurate, or that the tools will work without interruption. Use the Service at your own risk.</p>
+              </section>
+
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟪</span> Limitation of Liability</h2>
+                  <p className="text-muted-foreground">To the maximum extent permitted by law, All2ools and its affiliates are not liable for any data loss, file corruption, business interruption, loss of profits, or any indirect or consequential damages. Your only remedy is to stop using the Service.</p>
+              </section>
+              
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟫</span> Third-Party Services</h2>
+                  <p className="text-muted-foreground">Our website may use analytics tools, CDN providers, advertisers, or other third-party services. We are not responsible for the content or policies of third-party websites.</p>
+              </section>
+              
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟦</span> Governing Law</h2>
+                  <p className="text-muted-foreground">These Terms are governed by the laws of India, without regard to conflict of law provisions.</p>
+              </section>
+              
+              <section className="p-6 border rounded-lg bg-card">
+                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟩</span> Changes to These Terms</h2>
+                  <p className="text-muted-foreground">We may update or modify these Terms at any time. Your continued use of the Service after changes indicates acceptance.</p>
+              </section>
+
+              <section className="text-center p-6 border rounded-lg bg-card">
+                <h2 className="text-2xl font-semibold flex items-center justify-center gap-3 mb-4">
+                  <span className="text-3xl">🟧</span>
+                  Contact Us
+                </h2>
+                <p className="text-muted-foreground">If you have any questions about these Terms, reach us at:<br/>
+                <a href="mailto:support@all2ools.com" className="text-primary underline">📧 support@all2ools.com</a></p>
+              </section>
+            </div>
         </div>
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground bg-slate-50 dark:bg-slate-900 border-t">
@@ -58,7 +120,7 @@ export default function TermsOfUsePage() {
             <span>|</span>
             <Link href="/terms-of-use" className="hover:underline">Terms of Use</Link>
         </div>
-        <p className="mt-2">© {new Date().getFullYear()} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
+        <p className="mt-2">© {year} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
       </footer>
     </div>
   );
