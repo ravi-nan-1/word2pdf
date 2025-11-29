@@ -88,11 +88,6 @@ export default function TermsOfUsePage() {
               </section>
               
               <section className="p-6 border rounded-lg bg-card">
-                  <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟦</span> Governing Law</h2>
-                  <p className="text-muted-foreground">These Terms are governed by the laws of India, without regard to conflict of law provisions.</p>
-              </section>
-              
-              <section className="p-6 border rounded-lg bg-card">
                   <h2 className="text-2xl font-semibold flex items-center gap-3 mb-4"><span className="text-3xl">🟩</span> Changes to These Terms</h2>
                   <p className="text-muted-foreground">We may update or modify these Terms at any time. Your continued use of the Service after changes indicates acceptance.</p>
               </section>
