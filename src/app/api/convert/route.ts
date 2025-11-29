@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     // Append all other form data fields that are not files or special keys
     formData.forEach((value, key) => {
-        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && key !== 'html') {
+        if (key !== 'files' && key !== 'file' && key !== 'conversionType') {
              proxyFormData.append(key, value);
         }
     });
