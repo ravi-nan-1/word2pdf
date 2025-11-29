@@ -54,13 +54,14 @@ export async function POST(request: NextRequest) {
     const proxyFormData = new FormData();
     let hasContent = false;
 
-    // Handle HTML to PDF separately
+    // Handle HTML to PDF separately since the endpoint expects a string
     if (conversionType === 'html-to-pdf') {
         const htmlFile = formData.get('file') as File | null;
         const htmlContent = formData.get('html') as string | null;
 
         if (htmlFile) {
-            proxyFormData.append('file', htmlFile);
+            const fileContent = await htmlFile.text();
+            proxyFormData.append('html', fileContent);
             hasContent = true;
         } else if (htmlContent) {
             proxyFormData.append('html', htmlContent);
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Append all other form data fields that are not files or special keys
     formData.forEach((value, key) => {
-        if (key !== 'files' && key !== 'file' && key !== 'conversionType') {
+        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && key !== 'html') {
              proxyFormData.append(key, value);
         }
     });
