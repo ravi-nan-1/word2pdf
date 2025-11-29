@@ -1,10 +1,18 @@
+
 'use client';
 
 import { Header } from "@/components/header";
 import Link from "next/link";
 import { Mail, HelpCircle, Shield, User, MapPin } from "lucide-react";
+import { useState, useEffect } from 'react';
 
 export default function ContactPage() {
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background dark:bg-black">
       <Header />
@@ -68,7 +76,7 @@ export default function ContactPage() {
             <span>|</span>
             <Link href="/terms-of-use" className="hover:underline">Terms of Use</Link>
         </div>
-        <p className="mt-2">© {new Date().getFullYear()} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
+        <p className="mt-2">© {year} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
       </footer>
     </div>
   );

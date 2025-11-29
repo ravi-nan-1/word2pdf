@@ -1,16 +1,24 @@
+
 'use client';
 
 import { Header } from "@/components/header";
 import Link from "next/link";
+import { useState, useEffect } from 'react';
 
 export default function PrivacyPolicyPage() {
+  const [date, setDate] = useState('');
+
+  useEffect(() => {
+    setDate(new Date().toLocaleDateString());
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background dark:bg-black">
       <Header />
       <main className="flex-1 flex flex-col items-center p-4">
         <div className="w-full max-w-4xl mx-auto py-12 px-4 space-y-8 prose dark:prose-invert lg:prose-xl">
             <h1>Privacy Policy</h1>
-            <p>Last updated: {new Date().toLocaleDateString()}</p>
+            <p>Last updated: {date}</p>
 
             <p>PDF2Word ("us", "we", or "our") operates the PDF2Word website (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.</p>
             

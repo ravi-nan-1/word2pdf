@@ -8,12 +8,17 @@ import { SeoContent } from "@/components/seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import Link from "next/link";
 import { FeatureGrid } from "@/components/feature-grid";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { ConversionType } from "@/components/file-converter";
 
 
 export default function Home() {
   const [conversionType, setConversionType] = useState<ConversionType>("pdf-to-word");
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   const pageHeadings = useMemo(() => {
     switch (conversionType) {
@@ -73,7 +78,7 @@ export default function Home() {
             <span>|</span>
             <Link href="/terms-of-use" className="hover:underline">Terms of Use</Link>
         </div>
-        <p className="mt-2">© {new Date().getFullYear()} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
+        <p className="mt-2">© {year} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
       </footer>
     </div>
   );
