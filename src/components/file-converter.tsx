@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage, FileSpreadsheet, Presentation } from "lucide-react";
+import { UploadCloud, FileText, FileSignature, ArrowRight, Download, X, FileImage, FileSpreadsheet, Presentation, FileCode } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Textarea } from "./ui/textarea";
 
 export type ConversionType = 
   | "pdf-to-word" | "word-to-pdf" 
@@ -48,7 +49,7 @@ const getConversionInfo = (conversionType: ConversionType) => {
         case "excel-to-pdf": return { ...baseInfo, title: "Excel to PDF", actionText: "Convert to PDF", fromIcon: <FileSpreadsheet className="h-10 w-10 text-green-600" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "Excel", toType: "PDF", accept: ".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
         case "pdf-to-ppt": return { ...baseInfo, title: "PDF to PowerPoint", actionText: "Convert to PPT", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <Presentation className="h-10 w-10 text-orange-500" />, fromType: "PDF", toType: "PPT" };
         case "ppt-to-pdf": return { ...baseInfo, title: "PowerPoint to PDF", actionText: "Convert to PDF", fromIcon: <Presentation className="h-10 w-10 text-orange-500" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "PPT", toType: "PDF", accept: ".ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" };
-        case "html-to-pdf": return { ...baseInfo, title: "HTML to PDF", actionText: "Convert to PDF", fromIcon: <FileText className="h-10 w-10 text-blue-500" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "HTML", toType: "PDF", accept: ".html" };
+        case "html-to-pdf": return { ...baseInfo, title: "HTML to PDF", actionText: "Convert to PDF", fromIcon: <FileCode className="h-10 w-10 text-blue-500" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "HTML", toType: "PDF", accept: "text/html" };
         case "merge-pdf": return { ...baseInfo, title: "Merge PDF", actionText: "Merge PDFs", fromIcon: <FileText className="h-10 w-10 text-destructive" />, toIcon: <FileText className="h-10 w-10 text-destructive" />, fromType: "PDFs", toType: "PDF", multiple: true };
         case "split-pdf": return { ...baseInfo, title: "Split PDF", actionText: "Split PDF", fromType: "PDF", toType: "PDFs", params: [{ id: 'ranges', label: 'Page ranges (e.g., 1-3, 5, 7-9)', type: 'text' }] };
         case "extract-pages": return { ...baseInfo, title: "Extract Pages", actionText: "Extract Pages", fromType: "PDF", toType: "PDF", params: [{ id: 'pages', label: 'Pages to extract (e.g., 1, 3, 5-7)', type: 'text' }] };
@@ -68,6 +69,7 @@ const getConversionInfo = (conversionType: ConversionType) => {
 };
 
 function FileDropZone({
+  conversionType,
   conversionInfo,
   status,
   files,
@@ -80,7 +82,10 @@ function FileDropZone({
   handleDownload,
   resetState,
   setFiles,
+  htmlContent,
+  setHtmlContent,
 }: {
+  conversionType: ConversionType;
   conversionInfo: ReturnType<typeof getConversionInfo>;
   status: ConversionStatus;
   files: File[];
@@ -93,8 +98,51 @@ function FileDropZone({
   handleDownload: () => void;
   resetState: () => void;
   setFiles: (files: File[]) => void;
+  htmlContent: string;
+  setHtmlContent: (content: string) => void;
 }) {
   const { fromIcon, toIcon, fromType, actionText, accept, multiple, params } = conversionInfo;
+
+  if (conversionType === 'html-to-pdf') {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-center items-center gap-6">
+          {fromIcon}
+          <ArrowRight className="h-8 w-8 text-muted-foreground" />
+          {toIcon}
+        </div>
+        <Textarea
+          placeholder="Paste your HTML code here"
+          className="h-48"
+          value={htmlContent}
+          onChange={(e) => setHtmlContent(e.target.value)}
+        />
+        {status === 'converting' && (
+          <div className="space-y-2 text-center">
+            <Progress value={progress} className="w-full" />
+            <p className="text-sm text-muted-foreground animate-pulse">Converting... {progress}%</p>
+          </div>
+        )}
+        {(status === "idle" || status === "file-selected" || status === "error") && htmlContent && (
+            <Button onClick={handleConvert} className="w-full" size="lg">
+              {actionText}
+            </Button>
+        )}
+        {status === "done" && (
+          <div className="grid gap-4 sm:grid-cols-2">
+             <Button onClick={handleDownload} className="w-full" size="lg">
+              <Download className="mr-2 h-4 w-4" />
+              Download File
+            </Button>
+            <Button onClick={resetState} className="w-full" size="lg" variant="outline">
+              Convert Another
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
 
   return (
     <div className="space-y-6">
@@ -211,6 +259,7 @@ function FileDropZone({
 
 export function FileConverter({ conversionType, setConversionType }: FileConverterProps) {
   const [files, setFiles] = useState<File[]>([]);
+  const [htmlContent, setHtmlContent] = useState<string>("");
   const [status, setStatus] = useState<ConversionStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [convertedFile, setConvertedFile] = useState<{ blob: Blob, name: string } | null>(null);
@@ -225,6 +274,14 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   
   useEffect(() => {
     resetState();
+  }, [conversionType]);
+
+  const resetState = () => {
+    setFiles([]);
+    setHtmlContent("");
+    setStatus("idle");
+    setProgress(0);
+    setConvertedFile(null);
     const newParams: Record<string, string> = {};
     getConversionInfo(conversionType).params.forEach(param => {
       if (param.id === 'position') newParams[param.id] = 'bottom-center';
@@ -237,14 +294,6 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
       if (param.id === 'fontsize') newParams[param.id] = '12';
     });
     setAdditionalParams(newParams);
-  }, [conversionType]);
-
-  const resetState = () => {
-    setFiles([]);
-    setStatus("idle");
-    setProgress(0);
-    setConvertedFile(null);
-    setAdditionalParams({});
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -265,7 +314,8 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
   };
 
   const handleConvert = async () => {
-    if (!files.length) return;
+    if (conversionType !== 'html-to-pdf' && !files.length) return;
+    if (conversionType === 'html-to-pdf' && !htmlContent) return;
 
     setStatus("converting");
     setProgress(0);
@@ -286,9 +336,13 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
 
     try {
       const formData = new FormData();
-      files.forEach((file) => {
-          formData.append("files", file);
-      });
+      if (conversionType === 'html-to-pdf') {
+        formData.append("html", htmlContent);
+      } else {
+        files.forEach((file) => {
+            formData.append("files", file);
+        });
+      }
       formData.append("conversionType", conversionType);
 
       for (const key in additionalParams) {
@@ -359,7 +413,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
         variant: "destructive",
       });
       setTimeout(() => {
-         if (files.length > 0) {
+         if (files.length > 0 || htmlContent) {
             setStatus("file-selected");
         } else {
             resetState();
@@ -392,6 +446,7 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
      <div className="pt-6">
        <FileDropZone
         key={conversionType}
+        conversionType={conversionType}
         conversionInfo={conversionInfo}
         status={status}
         files={files}
@@ -404,6 +459,8 @@ export function FileConverter({ conversionType, setConversionType }: FileConvert
         handleDownload={handleDownload}
         resetState={resetState}
         setFiles={setFiles}
+        htmlContent={htmlContent}
+        setHtmlContent={setHtmlContent}
       />
     </div>
   );

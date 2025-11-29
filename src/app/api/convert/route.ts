@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const files = formData.getAll('files') as File[];
     const conversionType = formData.get('conversionType') as ConversionType | null;
 
-    if (!files || files.length === 0) {
+    if (conversionType !== 'html-to-pdf' && (!files || files.length === 0)) {
       return new NextResponse(JSON.stringify({ message: 'No files uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
     if (!conversionType) {
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     
     // This list now contains ALL tools that expect a single file.
     const singleFileTools: ConversionType[] = [
-        'word-to-pdf', 'excel-to-pdf', 'ppt-to-pdf', 'html-to-pdf',
+        'word-to-pdf', 'excel-to-pdf', 'ppt-to-pdf',
         'pdf-to-word', 'pdf-to-excel', 'pdf-to-ppt', 'pdf-to-jpg', 
         'split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 
         'rotate-pages', 'watermark-text', 'add-page-numbers', 
@@ -67,11 +67,14 @@ export async function POST(request: NextRequest) {
         'repair-pdf', 'pdf-to-pdfa', 'ocr-pdf'
     ];
     
-    const fileKey = singleFileTools.includes(conversionType) ? 'file' : 'files';
-    
-    files.forEach(file => {
-      proxyFormData.append(fileKey, file);
-    });
+    // For html-to-pdf, we don't deal with files from the user
+    if (conversionType !== 'html-to-pdf') {
+        const fileKey = singleFileTools.includes(conversionType) ? 'file' : 'files';
+        
+        files.forEach(file => {
+          proxyFormData.append(fileKey, file);
+        });
+    }
 
     // Append all other form data fields
     formData.forEach((value, key) => {
