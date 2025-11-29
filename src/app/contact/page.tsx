@@ -71,7 +71,7 @@ export default function ContactPage() {
               
               <div className="p-6 bg-card rounded-lg">
                   <h3 className="text-2xl font-semibold flex items-center gap-2 mb-4"><User className="h-6 w-6 text-primary" /> About Our Support Team</h3>
-                  <p className="text-muted-foreground">All2ools is created and managed by Rajeev Singh, a developer focused on building free, fast, secure online tools. We aim to provide quick and friendly support to all users.</p>
+                  <p className="text-muted-foreground">All2ools is created and managed by developers focused on building free, fast, secure online tools. We aim to provide quick and friendly support to all users.</p>
               </div>
               
               <div className="p-6 border rounded-lg">
