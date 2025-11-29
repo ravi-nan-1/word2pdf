@@ -62,7 +62,12 @@ export default function Home() {
         <RelatedTools />
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground bg-slate-50 dark:bg-slate-900 border-t">
-        © {new Date().getFullYear()} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link>
+        <div className="space-x-4">
+            <Link href="/" className="hover:underline">Home</Link>
+            <span>|</span>
+            <Link href="/about" className="hover:underline">About Us</Link>
+        </div>
+        <p className="mt-2">© {new Date().getFullYear()} PDF2Word. A part of <Link href="https://www.all2ools.com/" className="underline" target="_blank" rel="noopener noreferrer">All2ools.com</Link></p>
       </footer>
     </div>
   );
