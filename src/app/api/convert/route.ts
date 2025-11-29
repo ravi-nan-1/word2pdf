@@ -58,8 +58,15 @@ export async function POST(request: NextRequest) {
     const proxyFormData = new FormData();
     
     // For most endpoints, FastAPI expects the key 'files'
-    // For single-file endpoints with parameters, it might expect 'file'
-    const fileKey = ['split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 'edit-pdf', 'add-page-numbers', 'pdf-to-ppt'].includes(conversionType) ? 'file' : 'files';
+    // For single-file endpoints, it might expect 'file'
+    const singleFileTools: ConversionType[] = [
+        'split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 
+        'rotate-pages', 'watermark-text', 'protect-pdf', 'unlock-pdf', 
+        'edit-pdf', 'add-page-numbers', 'pdf-to-ppt', 'pdf-to-word',
+        'pdf-to-excel', 'pdf-to-jpg', 'ocr-pdf', 'pdf-to-pdfa', 'repair-pdf'
+    ];
+    
+    const fileKey = singleFileTools.includes(conversionType) ? 'file' : 'files';
     
     files.forEach(file => {
       proxyFormData.append(fileKey, file);
