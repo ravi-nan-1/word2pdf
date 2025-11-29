@@ -43,14 +43,16 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
-    const htmlFile = formData.get('file') as File | null;
     const conversionType = formData.get('conversionType') as ConversionType | null;
 
-    if (conversionType !== 'html-to-pdf' && !files?.length && !htmlFile) {
-      return new NextResponse(JSON.stringify({ message: 'No files uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-    }
     if (!conversionType) {
       return new NextResponse(JSON.stringify({ message: 'No conversion type specified' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+    
+    if (conversionType !== 'html-to-pdf' && !files?.length) {
+       if (!formData.get('html')) {
+          return new NextResponse(JSON.stringify({ message: 'No files uploaded' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+       }
     }
 
     const apiEndpoint = getApiEndpoint(conversionType);
@@ -58,22 +60,21 @@ export async function POST(request: NextRequest) {
 
     const proxyFormData = new FormData();
     
-    const singleFileTools: ConversionType[] = [
-        'word-to-pdf', 'excel-to-pdf', 'ppt-to-pdf',
-        'pdf-to-word', 'pdf-to-excel', 'pdf-to-ppt', 'pdf-to-jpg', 
-        'split-pdf', 'extract-pages', 'delete-pages', 'reorder-pages', 
-        'rotate-pages', 'watermark-text', 'add-page-numbers', 
-        'protect-pdf', 'unlock-pdf', 'edit-pdf', 
-        'repair-pdf', 'pdf-to-pdfa', 'ocr-pdf', 'html-to-pdf'
-    ];
+    const multiFileTools: ConversionType[] = ['jpg-to-pdf', 'merge-pdf'];
     
     if (conversionType === 'html-to-pdf') {
+        const htmlFile = formData.get('file') as File | null;
+        const htmlContent = formData.get('html') as string | null;
         if (htmlFile) {
             proxyFormData.append('file', htmlFile);
         }
+        if (htmlContent) {
+            proxyFormData.append('html', htmlContent);
+        }
     } else {
-        const fileKey = singleFileTools.includes(conversionType) ? 'file' : 'files';
-        const filesToAppend = fileKey === 'file' ? files.slice(0,1) : files;
+        const isMulti = multiFileTools.includes(conversionType);
+        const fileKey = isMulti ? 'files' : 'file';
+        const filesToAppend = isMulti ? files : files.slice(0, 1);
 
         filesToAppend.forEach(file => {
           proxyFormData.append(fileKey, file);
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     // Append all other form data fields
     formData.forEach((value, key) => {
-        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && typeof value === 'string') {
+        if (key !== 'files' && key !== 'file' && key !== 'conversionType' && key !== 'html' && typeof value === 'string') {
              proxyFormData.append(key, value);
         }
     });
@@ -141,5 +142,3 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({ message: `Server error: ${errorMessage}` }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
-
-    
