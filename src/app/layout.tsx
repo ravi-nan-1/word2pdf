@@ -32,10 +32,7 @@ export const metadata: Metadata = {
     description: 'Fast, secure and accurate PDF to Word converter.',
     images: ['/og-image.png'],
   },
-  metadataBase: new URL('https://pdf2word.all2ools.com'),
-  alternates: {
-    canonical: '/',
-  },
+  
 };
 
 function PingBackend() {
@@ -54,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} antialiased`} suppressHydrationWarning>
       <head>
-        <link rel="canonical" href="https://pdf2word.all2ools.com/" />
+        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
